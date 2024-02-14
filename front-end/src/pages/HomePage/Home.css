@@ -1,0 +1,10 @@
+.hero-section{
+    background-image: url("../../assets/hero-section.jpg");
+    background-size: 100% 100%;
+   
+    
+    color: white;
+}
+body{
+    box-sizing: border-box;
+}
