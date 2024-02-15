@@ -1,0 +1,24 @@
+
+const Error = () => {
+  
+
+  return (
+    <div className="h-screen w-screen px-2 flex flex-col justify-center items-center bg-gradient-to-b from-red-500 to-red-700 text-white">
+      <div className="text-4xl font-bold mb-4">Oops, Something Went Wrong!</div>
+      <p className="text-lg">
+        We're sorry, but an error occurred while processing your request.
+      </p>
+      <p className="text-lg">
+        Please try again later or contact support if the issue persists.
+      </p>
+      <button
+        className="mt-8 px-4 py-2 bg-white text-red-500 rounded-lg hover:bg-red-100 hover:text-red-600 focus:outline-none"
+        
+      >
+        Reload Page
+      </button>
+    </div>
+  );
+};
+
+export default Error;

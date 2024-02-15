@@ -17,6 +17,11 @@ const Chat = () => {
     <Layout>
       <div className="h-screen w-screen flex ">
         <ChatLeftUi chatShow={handleClick} smallScreen={false} />
+        {!showChat && (
+          <div className="md:flex w-2/3 justify-center items-center bg-green-500 text-black hidden">
+            Welcome to chatBox!
+          </div>
+        )}
         {showChat ? (
           <ChatBox chatShow={handleClick} />
         ) : (
