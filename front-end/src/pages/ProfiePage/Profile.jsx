@@ -3,6 +3,7 @@ import Layout from "../../Layout/Layout";
 import { FaEdit } from "react-icons/fa";
 import AddProduct from "../../components/AddProduct/AddProduct";
 import ProductList from "../../components/ProductList/ProductList";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
 
@@ -32,7 +33,9 @@ const Profile = () => {
             >
               Rudra Sarkar
             </h2>
-            <FaEdit className=" text-black" />
+            <Link to="/profile-update/1">
+              <FaEdit className=" text-black" />
+            </Link>
           </div>
 
           <div className="text-center mt-2">
@@ -73,7 +76,7 @@ const Profile = () => {
       </ul>
 
       <div className="product-list gap-5 flex-wrap mb-12 flex-col md:flex-row flex justify-center p-5 w-full min-h-fit">
-       {showProducts?<ProductList/>:<AddProduct/>}
+        {showProducts ? <ProductList /> : <AddProduct />}
       </div>
     </Layout>
   );

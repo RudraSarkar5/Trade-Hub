@@ -7,6 +7,9 @@ import ProductInfo from "../pages/ProductInfoPage/ProductInfo";
 import Profile from "../pages/ProfiePage/Profile";
 import ContactUs from "../pages/ContactUsPage/ContactUs";
 import Error from "../pages/ErrorPage/Error";
+import EditProduct from "../pages/EditProductPage/EditProduct";
+import EditProfile from "../pages/EditProfilePage/EditProfile";
+
 const CustomRoutes=()=>{
     return (
         <Routes>
@@ -16,7 +19,9 @@ const CustomRoutes=()=>{
             <Route path='/signup' element={<Signup/>} />
             <Route path='/product-info/:id' element={<ProductInfo/>}/>
             <Route path='/profile/:id' element={<Profile/>} />
+            <Route path='/profile-update/:id' element={<EditProfile/>} />
             <Route path='/contact-us' element={<ContactUs/>} />
+            <Route path='/product-update/:id' element={<EditProduct/>} />
             <Route path='/*' element={<Error/>} />
 
         </Routes>
