@@ -4,8 +4,8 @@ import UserMessage from "../Messages/UserMessage";
 import FriedMessage from "../Messages/FriendMessage";
 const ChatBox = ({ chatShow }) => {
   return (
-    <div className="w-screen h-screen  md:w-2/3 bg-red-500">
-      <div className="w-full h-full  bg-blue-500">
+    <div className="w-screen h-full  md:w-2/3 ">
+      <div className="w-full h-full  ">
         <div className="w-full h-fit bg-gray-600 p-2 items-center flex gap-2 ">
           <IoMdArrowBack className="md:hidden block" onClick={chatShow} />
           <img
@@ -18,7 +18,17 @@ const ChatBox = ({ chatShow }) => {
         </div>
         {/* friend list */}
 
-        <div className="w-full overflow-scroll bg-slate-500 h-[95vh] space-y-2">
+        <div className="w-full pb-3 overflow-scroll  h-full space-y-2">
+          <UserMessage msg="hii anis whats up " />
+          <UserMessage msg="myself anish " />
+          <UserMessage msg="hii  am working hard  " />
+          <FriedMessage msg="hey rudra i am good " />
+          <FriedMessage msg=" hey rudra i am goodhey rudra i am goodhey rudra i am goodhey rudra i am goodhey rudra i am goodhey rudra i am good " />
+          <UserMessage msg="hii anis whats up " />
+          <UserMessage msg="myself anish " />
+          <UserMessage msg="hii  am working hard  " />
+          <FriedMessage msg="hey rudra i am good " />
+          <FriedMessage msg=" hey rudra i am goodhey rudra i am goodhey rudra i am goodhey rudra i am goodhey rudra i am goodhey rudra i am good " />
           <UserMessage msg="hii anis whats up " />
           <UserMessage msg="myself anish " />
           <UserMessage msg="hii  am working hard  " />

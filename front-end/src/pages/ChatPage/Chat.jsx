@@ -4,18 +4,16 @@ import ChatLeftUi from "../../components/ChatLeftUi/ChatLeftUi";
 import Layout from "../../Layout/Layout";
 
 const Chat = () => {
-  
   const [showChat, setShowChat] = useState(false);
 
-  const handleClick =()=>{
+  const handleClick = () => {
     console.log("enter");
     setShowChat(!showChat);
-  }
- 
+  };
 
   return (
     <Layout>
-      <div className="h-screen w-screen flex ">
+      <div className="h-[80vh] pb-5 w-screen flex ">
         <ChatLeftUi chatShow={handleClick} smallScreen={false} />
         {!showChat && (
           <div className="md:flex w-2/3 justify-center items-center bg-green-500 text-black hidden">

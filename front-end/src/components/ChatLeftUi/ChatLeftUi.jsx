@@ -2,8 +2,8 @@ import { useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 const ChatLeftUi = ({ smallScreen = true, chatShow }) => {
   const clsName = smallScreen
-    ? "w-screen h-screen md:hidden  md:w-1/3 bg-red-500"
-    : "w-screen h-screen hidden md:block  md:w-1/3 bg-red-500";
+    ? "w-screen h-[90vh] md:hidden  md:w-1/3 bg-red-500"
+    : "w-screen h-[90vh] hidden md:block  md:w-1/3 bg-red-500";
   return (
     <div className={clsName}>
       <div className="w-full h-full  bg-blue-500">
@@ -19,7 +19,7 @@ const ChatLeftUi = ({ smallScreen = true, chatShow }) => {
         </div>
         {/* friend list */}
 
-        <div className="w-full overflow-scroll bg-red-500 h-[93vh] space-y-2">
+        <div className="w-full overflow-scroll bg-red-500 h-[80vh] space-y-2">
           <div
             onClick={chatShow}
             className=" w-full rounded-md h-fit p-2 bg-green-500"
