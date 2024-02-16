@@ -1,7 +1,8 @@
 import emailValidator from "email-validator";
 import { passwordHashed } from "../utility/password.js";
+import cloudinary from "cloudinary";
 
-export const userRegister = (req, res, next) => {
+export const userRegister = async (req, res, next) => {
   const { name, email, password } = req.body;
 
 //   this will check that all the field is filled or not 
@@ -11,13 +12,8 @@ export const userRegister = (req, res, next) => {
       message: "Please provide all the field"
     });
   }
-console.log(req.file);
-  if (req.file) {
-    // File uploaded successfully
-    res.send("File uploaded successfully.");
-  } else {
-    res.send("file is not uploaded");
-  }
+
+  
 
 //   this will check the provided email is valid  or not
   if(!emailValidator.validate(email)){
@@ -37,7 +33,30 @@ console.log(req.file);
 
  const hashedPasword = passwordHashed(password);
 
- 
+ if(req.file){
+
+    const option = {
+      folder: "Trade_Hub",
+      width: 250,
+      height: 250,
+      crop: "fill",
+      gravity: "center",
+    };
+   
+    await cloudinary.v2.uploader.upload(
+      req.file.path,
+      option,
+      function (error, success) {
+        if (success) {
+          console.log(success);
+        } else {
+          console.log(error);
+        }
+      }
+    );
+   
+
+ }
 
 //  if all the check is completly passed and user if created successfully then send success response
  res.status(201).json({
