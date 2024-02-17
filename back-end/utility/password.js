@@ -5,3 +5,7 @@ export const passwordHashed =(password)=>{
     const hashedPasword = bcrypt.hashSync(password,salt);
     return hashedPasword;
 }
+
+export const comparePassword = (userInputPassword,existedPassword)=>{
+    return bcrypt.compareSync(userInputPassword,existedPassword);
+}
