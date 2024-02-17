@@ -4,6 +4,7 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 config();
 import userRoute from "./routes/user.route.js";
+import productRoute from "./routes/product.route.js";
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(cookieParser());
 
 
 app.use("/api/user", userRoute);
+app.use("/api/product",productRoute);
 
 
 app.use("*", (req, res) => {
