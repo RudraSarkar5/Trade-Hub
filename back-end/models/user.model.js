@@ -18,9 +18,18 @@ const userSchema = new Schema(
       type: String,
       minlength: [5, "Password should be at least 5 characters"],
     },
-    avatar: {
+    location: {
       type: String,
-      default: "./assets/avatar.png",
+    },
+    avatar: {
+      secure_url: {
+        type: String,
+        default: "./assets/avatar.png"
+      },
+      pubilc_id : {
+        type : String,
+
+      }
     },
   },
   {

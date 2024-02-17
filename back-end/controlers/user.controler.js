@@ -7,7 +7,7 @@ import fs from "fs";
 
 
 const cookieOption = {
-  maxAge : 24 * 60 * 60,
+  maxAge : 24 * 60 * 60 * 1000,
   httpOnly : true
 }
 
@@ -16,12 +16,12 @@ export const userRegister = async (req, res) => {
 
   try {
       // this will check that all the field is filled or not 
-      if (!name || !email || !password) {
-        res.status(400).json({
+      if (!name || !email || !password || !location) {
+        return res.status(400).json({
           success: false,
           message: "Please provide all the field"
         });
-        return;
+        
       }
 
       //   this will check the provided email is valid  or not
@@ -34,7 +34,7 @@ export const userRegister = async (req, res) => {
       }
 
     //   this will check the length of every field
-      if(name.length < 5 || email.length < 5 || password.length < 6){
+      if(name.length < 5 || email.length < 5 || password.length < 6 || location.length < 3){
         res.status(400).json({
           success: false,
           message: "Please provide valid size of every field"
@@ -61,7 +61,8 @@ export const userRegister = async (req, res) => {
     const user = await userModel.create({
       name,
       email,
-      password : hashedPasword
+      password : hashedPasword,
+      location
     })
 
   // if user upload image then it will invoke 
@@ -81,7 +82,8 @@ export const userRegister = async (req, res) => {
                 option,
                 async function (success,error) {
                   if (success) {
-                    user.avatar = success.secure_url;
+                    user.avatar.secure_url = success.secure_url;
+                    user.avatar.public_id = success.public_id;
                     await user.save();
                   }
                 }
@@ -215,11 +217,68 @@ export const userDelete = async(req,res)=>{
    
 }
 
-export const userLogOut = async(req,res)=>{
+export const userLogOut = (req,res)=>{
    res.cookie("token",null);
    return res.status(200).json({
      success: true,
      message: "User logged out successfully",
    });
 
+}
+
+export const userProfileEdit = async(req,res)=>{
+    const userId = req.user.id;
+    const {name , location} =  req.body;
+    try {
+       const user = await userModel.findById(userId);
+       if (!name || !location) {
+         return res.status(400).json({
+           success: false,
+           message: "Please provide all the field",
+         });
+       }
+
+       user.name = name;
+       user.location = location;
+       if (req.file) {
+         await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+         const option = {
+           folder: "Trade_Hub",
+           width: 250,
+           height: 250,
+           crop: "fill",
+           gravity: "center",
+         };
+
+         try {
+           await cloudinary.v2.uploader.upload(
+             req.file.path,
+             option,
+             async function (success, error) {
+               if (success) {
+                 user.avatar.secure_url = success.secure_url;
+                 user.avatar.public_id = success.public_id;
+                 await user.save();
+               }
+             }
+           );
+         } catch (error) {
+           return res.status(500).json({
+             success: false,
+             message: error.message,
+           });
+         }
+       }
+       return res.status(200).json({
+        success : true,
+        messgae : "profile updated successfully"
+       })
+
+    } catch (error) {
+      return res.status(500).json({
+        success : true,
+        message : error.message
+      })
+    }
+    
 }
