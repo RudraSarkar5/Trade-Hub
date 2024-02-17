@@ -104,7 +104,7 @@ export const userRegister = async (req, res) => {
     user.password = undefined;
     
     // here by giving user value one token will be generate 
-    const token = generateJwtToken(JSON.parse(JSON.stringify(user)));
+    const token = await generateJwtToken(JSON.parse(JSON.stringify(user)));
     
     // then save token as cookie
     res.cookie("token", token, cookieOption);
@@ -192,3 +192,34 @@ export const userLogin = async (req, res) => {
       })
     }
 };
+
+export const userDelete = async(req,res)=>{
+   const userId = req.user.id;
+   console.log(userId);
+   try {
+    const result = await userModel.findByIdAndDelete(userId);
+      if (result) {
+        res.cookie("token", null);
+        return res.status(200).json({
+          success: true,
+          message: "account successfully deleted.",
+        });
+      }
+   } catch (error) {
+      return res.status(200).json({
+        success: false,
+        message: error.message
+      });
+   }
+   
+   
+}
+
+export const userLogOut = async(req,res)=>{
+   res.cookie("token",null);
+   return res.status(200).json({
+     success: true,
+     message: "User logged out successfully",
+   });
+
+}
