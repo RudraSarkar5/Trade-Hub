@@ -12,7 +12,7 @@ const cookieOption = {
 }
 
 export const userRegister = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password , location } = req.body;
 
   try {
       // this will check that all the field is filled or not 
@@ -196,12 +196,12 @@ export const userLogin = async (req, res) => {
 };
 
 export const userDelete = async(req,res)=>{
-   const userId = req.user.id;
+   const userId = req.user._id;
    console.log(userId);
    try {
     const result = await userModel.findByIdAndDelete(userId);
       if (result) {
-        res.cookie("token", null);
+        res.clearCookie("token");
         return res.status(200).json({
           success: true,
           message: "account successfully deleted.",
@@ -218,7 +218,7 @@ export const userDelete = async(req,res)=>{
 }
 
 export const userLogOut = (req,res)=>{
-   res.cookie("token",null);
+   res.clearCookie("token");
    return res.status(200).json({
      success: true,
      message: "User logged out successfully",
@@ -227,7 +227,7 @@ export const userLogOut = (req,res)=>{
 }
 
 export const userProfileEdit = async(req,res)=>{
-    const userId = req.user.id;
+    const userId = req.user._id;
     const {name , location} =  req.body;
     try {
        const user = await userModel.findById(userId);

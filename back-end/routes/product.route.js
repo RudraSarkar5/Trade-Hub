@@ -14,7 +14,7 @@ productRoute.post(
   addProduct
 );
 productRoute.put(
-  "/update-product",
+  "/update-product/:productId",
   isLoggedIn,
   upload.array("images", 5),
   handleMulterError,

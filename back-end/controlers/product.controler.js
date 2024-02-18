@@ -1,5 +1,6 @@
 import productModel from "../models/product.model.js"
 import cloudinary from "cloudinary";
+import { log } from "console";
 import fs from "fs";
 
 export const getAllProducts = async (req, res) => {
@@ -120,6 +121,7 @@ export const addProduct = async(req,res)=>{
 }
 export const updateProduct = async(req,res)=>{
   const { productId } = req.params;
+  let images = null;
   try {
     const product = await productModel.findById(productId);
     // this will destructure the req.body object
@@ -150,7 +152,7 @@ export const updateProduct = async(req,res)=>{
         await cloudinary.v2.uploader.destroy(image.public_id);
       }
       product.images = [];
-      const images = req.files;
+      images = req.files;
       const productImage = {};
 
       //   this function will upload all imgaes to cloudinary and simply set all the link to product collection named images array
@@ -171,7 +173,7 @@ export const updateProduct = async(req,res)=>{
       await product.save();
       return res.status(200).json({
         success: true,
-        message: "product added successfully",
+        message: "product updated successfully",
       });
     }
  } catch (error) {

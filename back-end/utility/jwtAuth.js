@@ -5,7 +5,8 @@ export const generateJwtToken = async (payload)=>{
     return token;
 }
 
-export const getUserPayload =async (token)=>{
-     const userPayload =  await jwt.verify(token,process.env.SECRET_KEY);
-     return userPayload;
+export const getUserPayload =async(token)=>{
+     const userPayload = await jwt.verify(token, process.env.SECRET_KEY);
+      return userPayload;
+     
 }
