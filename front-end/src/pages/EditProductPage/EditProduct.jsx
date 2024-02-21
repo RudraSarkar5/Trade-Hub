@@ -2,12 +2,13 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { addProduct } from "../../redux/userProductSlice";
+import { addProduct, updateProduct } from "../../redux/userProductSlice";
 import Layout from "../../Layout/Layout";
 
 const EditProduct = () => {
   const {state} =  useLocation();
-  const {productName,description,category,price} = state;
+  const {productName,description,category,price,_id} = state;
+  // console.log(state);
 
   const [productData, setProductData] = useState({
     productName,
@@ -15,7 +16,7 @@ const EditProduct = () => {
     category,
     price
   });
-  console.log(productData);
+  // console.log(productData);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ const EditProduct = () => {
       [name]: value,
     });
   };
+
   const handleImage = (e) => {
     const { files, name } = e.target;
     setProductData({
@@ -34,37 +36,41 @@ const EditProduct = () => {
       [name]: files,
     });
   };
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   if (
-  //     !productData.name ||
-  //     !productData.price ||
-  //     !productData.category ||
-  //     !productData.images ||
-  //     !productData.description
-  //   ) {
-  //     toast.error("please fill all the field");
-  //     return;
-  //   }
-  //   if (productData.images.length < 3) {
-  //     toast.error("please add atleast 3 images");
-  //     return;
-  //   }
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+    if (
+      !productData.productName ||
+      !productData.price ||
+      !productData.category ||
+      !productData.description
+    ) {
+      toast.error("please fill all the field");
+      return;
+    }
+   
 
-  //   const productFormData = new FormData();
-  //   productFormData.append("name", productData.name);
-  //   productFormData.append("price", productData.price);
-  //   productFormData.append("category", productData.category);
-  //   productFormData.append("description", productData.description);
-  //   for (let i = 0; i < productData.images.length; i++) {
-  //     productFormData.append("images", productData.images[i]);
-  //   }
-  //   const action = dispatch(addProduct(productFormData));
-  //   if (action.payload?.success) {
-  //     navigate("/profile");
-  //     setProductData({});
-  //   }
-  // };
+    const productFormData = new FormData();
+    productFormData.append("productName", productData.productName);
+    productFormData.append("price", productData.price);
+    productFormData.append("category", productData.category);
+    productFormData.append("description", productData.description);
+      
+     if (productData.images) {
+       if (productData.images.length < 3) {
+         toast.error("please add atleast 3 images");
+         return;
+       }
+       for (let i = 0; i < productData.images.length; i++) {
+         productFormData.append("images", productData.images[i]);
+       }
+     }
+    // console.log(productFormData,_id);
+    const action = await dispatch(updateProduct({productFormData,_id}));
+    if (action.payload?.success) {
+      navigate("/profile");
+      
+    }
+  };
 
   return (
     <Layout>
@@ -73,7 +79,7 @@ const EditProduct = () => {
           <h1 className="text-2xl font-semibold text-center ">
             Update Product
           </h1>
-          <form encType="multipart/form-data">
+          <form onSubmit={handleSubmit} encType="multipart/form-data">
             <div className="">
               <label htmlFor="productName" className="block ">
                 Product Name
@@ -82,7 +88,7 @@ const EditProduct = () => {
                 value={productData.productName}
                 onChange={handleChange}
                 type="text"
-                name="name"
+                name="productName"
                 className="w-full px-2  border rounded-md focus:outline-none focus:border-blue-500"
               />
             </div>

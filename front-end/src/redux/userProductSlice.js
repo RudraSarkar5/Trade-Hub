@@ -24,6 +24,27 @@ export const addProduct =
             throw error;
         }
     })
+export const updateProduct = createAsyncThunk(
+  "product/updateProduct",
+  async function ({productFormData, _id }) {
+    console.log(productFormData,_id);
+    try {
+      let response = axios.put(
+        `/product/update-product/${_id}`,
+        productFormData
+      );
+      toast.promise(response, {
+        loading: "updating product...",
+        success: (response) => response.data.message,
+        error: (error) => error.response.data.message,
+      });
+      response = await response;
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+);
 
  export const getUserProducts = createAsyncThunk("/product/userProducts",async function(){
         try {
@@ -86,6 +107,10 @@ const userProductSlice = createSlice({
             
         })
         .addCase(deleteProduct.fulfilled,(state,action)=>{
+          state.productLoaded=false;
+            
+        })
+        .addCase(updateProduct.fulfilled,(state,action)=>{
           state.productLoaded=false;
             
         })

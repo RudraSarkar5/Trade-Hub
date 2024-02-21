@@ -73,15 +73,17 @@ export const addProduct = async(req,res)=>{
   // this will destructure the req.body object
   const { productName, description, category, price } = req.body;
   
+  
 
   //   this will check any field is empty or not if empty then simply send a error response
-  if (!productName || !description || !category || !price) {
+  if (!productName || !description || !category || !price ) {
     console.log("enter boys");
     return res.status(401).json({
       success: false,
       message: "please fill all field",
     });
   }
+  
 
   //   if there is lest than three images has uploaded then simply return a error response
   
@@ -94,7 +96,7 @@ export const addProduct = async(req,res)=>{
   }
 
   const images = req.files;
-  const productImage = {};
+  
 
   try {
     const product = await productModel.create({
@@ -108,6 +110,7 @@ export const addProduct = async(req,res)=>{
     //   this function will upload all imgaes to cloudinary and simply set all the link to product collection named images array
     const uploadImages = async () => {
       for (const image of images) {
+        const productImage = {};
         const result = await cloudinary.v2.uploader.upload(image.path, {
           folder: "productImages",
         });
@@ -132,43 +135,38 @@ export const addProduct = async(req,res)=>{
         message : error.message
     })
   }finally{
-    try {
+   
       for (const image of images) {
         fs.unlinkSync(image.path);
-      }
-    }catch (error) {
-      await product.deleteOne();
-      return res.status(500).json({
-        success:false,
-        message : error.message
-      })
-    }
-    
+      }    
   }
 
 }
+
 export const updateProduct = async(req,res)=>{
   const { productId } = req.params;
-  let images = null;
+ 
+  let images = req.files;
   try {
     const product = await productModel.findById(productId);
     // this will destructure the req.body object
-    const { name, description, category, price } = req.body;
-    //   this will check any field is empty or not if empty then simply send a error response
-    if (!name || !description || !category || !price) {
-      
+    const { productName, description, category, price } = req.body;
+   
+      // this will check any field is empty or not if empty then simply send a error response
+    if (!productName || !description || !category || !price) {
       return res.status(401).json({
         success: false,
         message: "please fill all field",
       });
     }
 
-    product.name = name;
+    product.productName = productName;
     product.description = description;
     product.category = category;
     product.price = price;
-
-    if (req.files) {
+    
+     console.log(req.files.length);
+    if (req.files.length > 0) {
       //   if there is lest than three images has uploaded then simply return a error response
       if (req.files.length < 3) {
         return res.status(401).json({
@@ -182,38 +180,49 @@ export const updateProduct = async(req,res)=>{
       }
       product.images = [];
       images = req.files;
-      const productImage = {};
+      
 
       //   this function will upload all imgaes to cloudinary and simply set all the link to product collection named images array
       const uploadImages = async () => {
-        for (const image of images) {
-          const result = await cloudinary.v2.uploader.upload(image.path, {
-            folder: "productImages",
-          });
-          if (result) {
-            productImage.secure_url = result.secure_url;
-            productImage.public_id = result.public_id;
+        try {
+          for (const image of images) {
+            let productImage = {};
+            const result = await cloudinary.v2.uploader.upload(image.path, {
+              folder: "productImages",
+            });
+            if (result) {
+              productImage.secure_url = result.secure_url;
+              productImage.public_id = result.public_id;
+            }
+            product.images.push(productImage);
           }
-          product.images.push(productImage);
+        } catch (error) {
+          throw error;
         }
+        
       };
 
       await uploadImages();
-      await product.save();
-      return res.status(200).json({
-        success: true,
-        message: "product updated successfully",
-      });
+      
     }
+    await product.save();
+    return res.status(200).json({
+      success: true,
+      message: "product updated successfully",
+    });
  } catch (error) {
+  console.log(error);
     return res.status(500).json({
       success: false,
       message: error.message,
     });
   } finally {
-    for (const image of images) {
-      fs.unlinkSync(image.path);
+    if(req.files.length > 0){
+      for (const image of images) {
+        fs.unlinkSync(image.path);
+      }
     }
+    
   }  
   
 }

@@ -26,9 +26,8 @@ const AddProduct = ({ controlShowProduct }) => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!productData.productName) {
+    if (!productData.productName || !productData.description || !productData.category || !productData.price || !productData.images) {
       toast.error("please fill all the field");
-      console.log(productData);
       console.log("what worng");
       return;
     }
@@ -53,83 +52,85 @@ const AddProduct = ({ controlShowProduct }) => {
   };
 
   return (
-    <div className="  flex justify-center w-full md:w-2/3 items-center">
-      <div className="p-3 bg-black shadow-lg rounded-md w-full   ">
-        <h1 className="text-2xl font-semibold text-center mb-4">
-          Add a New Product
-        </h1>
-        <form onSubmit={handleSubmit} encType="multipart/form-data">
-          <div className="mb-4">
-            <label htmlFor="productName" className="block text-gray-600">
-              Product Name
-            </label>
-            <input
-              onChange={handleChange}
-              type="text"
-              name="productName"
-              className="w-full px-2 py-1 border rounded-md focus:outline-none focus:border-blue-500"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="description" className="block text-gray-600">
-              Description
-            </label>
-            <textarea
-              onChange={handleChange}
-              rows="5"
-              name="description"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="price" className="block text-gray-600">
-              Price
-            </label>
-            <input
-              onChange={handleChange}
-              type="number"
-              name="price"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="price" className="block text-gray-600">
-              Category
-            </label>
-            <input
-              onChange={handleChange}
-              type="text"
-              name="category"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
-            />
-          </div>
-          <div className="mb-4">
-            <div className="flex  items-center gap-5">
-              <label htmlFor="productImages" className="block text-gray-600">
-                Images
+    <div className="h-full w-screen flex justify-center items-center">
+      <div className="  flex justify-center w-full md:w-2/3 items-center">
+        <div className="p-3 border-white border-2 rounded-lg shadow-lg  w-full   ">
+          <h1 className="text-2xl font-semibold text-center mb-4">
+            Add a New Product
+          </h1>
+          <form   onSubmit={handleSubmit} encType="multipart/form-data">
+            <div className="mb-4">
+              <label htmlFor="productName" className="block ">
+                Product Name
               </label>
-              <h2 className=" text-red-600 font-bold">* max 5 images</h2>
+              <input
+                onChange={handleChange}
+                type="text"
+                name="productName"
+                className="w-full px-2 py-1 border rounded-md focus:outline-none focus:border-blue-500"
+              />
             </div>
+            <div className="mb-4">
+              <label htmlFor="description" className="block ">
+                Description
+              </label>
+              <textarea
+                onChange={handleChange}
+                rows="5"
+                name="description"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="price" className="block ">
+                Price
+              </label>
+              <input
+                onChange={handleChange}
+                type="number"
+                name="price"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="price" className="block ">
+                Category
+              </label>
+              <input
+                onChange={handleChange}
+                type="text"
+                name="category"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <div className="flex  items-center gap-5">
+                <label htmlFor="productImages" className="block ">
+                  Images
+                </label>
+                <h2 className=" text-red-600 font-bold">* max 5 images</h2>
+              </div>
 
-            <input
-              onChange={handleImage}
-              type="file"
-              name="images"
-              accept="image/*"
-              multiple
-              className="w-full"
-            />
-          </div>
-          <div className="text-center">
-            <button
-              type="submit"
-              className="cursor-pointer px-4 py-2 bg-blue-500
+              <input
+                onChange={handleImage}
+                type="file"
+                name="images"
+                accept="image/*"
+                multiple
+                className="w-full"
+              />
+            </div>
+            <div className="text-center">
+              <button
+                type="submit"
+                className="cursor-pointer px-4 py-2 bg-blue-500
             text-white rounded-md hover:bg-blue-600"
-            >
-              Add Product
-            </button>
-          </div>
-        </form>
+              >
+                Add Product
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

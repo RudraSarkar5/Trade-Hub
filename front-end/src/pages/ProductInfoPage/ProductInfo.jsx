@@ -22,7 +22,7 @@ const ProductInfo = () => {
             />
           </div>
           {images&&images.map((image,idx)=>(
-               <div>
+               <div key={image.public_id}>
                  <img
                    onClick={()=>setBigImage(image.secure_url)}
                    src={image.secure_url}

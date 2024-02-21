@@ -4,6 +4,7 @@ import userModel from "../models/user.model.js";
 import { generateJwtToken } from "../utility/jwtAuth.js";
 import cloudinary from "cloudinary";
 import fs from "fs";
+import { log } from "console";
 
 
 const cookieOption = {
@@ -65,7 +66,7 @@ export const userRegister = async (req, res) => {
       location,
       avatar: {
         secure_url: "./assets/avatar.png",
-        public_id: "dummy id",
+        public_id: ""
       },
     });
     
@@ -137,6 +138,7 @@ export const userRegister = async (req, res) => {
 
 export const userLogin = async (req, res) => {
   const {email,password} = req.body;
+  console.log("value",req.body);
  
     try {
       // this will check that all the field is filled or not
@@ -254,19 +256,26 @@ export const userLogOut = (req,res)=>{
 export const userProfileEdit = async(req,res)=>{
     const userId = req.user._id;
     const {name , location} =  req.body;
+
+     if (!name || !location) {
+       return res.status(400).json({
+         success: false,
+         message: "Please provide all the field",
+       });
+     }
+
     try {
        const user = await userModel.findById(userId);
-       if (!name || !location) {
-         return res.status(400).json({
-           success: false,
-           message: "Please provide all the field",
-         });
-       }
-
+      
        user.name = name;
        user.location = location;
+       console.log(req.file);
        if (req.file) {
-         await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+        
+          if(user.avatar.public_id.length != 0){
+            await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+          }
+        
          const option = {
            folder: "Trade_Hub",
            width: 250,
@@ -276,21 +285,21 @@ export const userProfileEdit = async(req,res)=>{
          };
 
          try {
-           await cloudinary.v2.uploader.upload(
+            const result =  await cloudinary.v2.uploader.upload(
              req.file.path,
-             option,
-             async function (success, error) {
-               if (success) {
-                 user.avatar.secure_url = success.secure_url;
-                 user.avatar.public_id = success.public_id;
+             option)
+             if(result){
+               user.avatar.secure_url = result.secure_url;
+                 user.avatar.public_id = result.public_id;
                  await user.save();
-               }
              }
-           );
+             
+           
          } catch (error) {
+          console.log(error.message);
            return res.status(500).json({
              success: false,
-             message: error.message,
+             message: error.message
            });
          }
        }
@@ -301,10 +310,15 @@ export const userProfileEdit = async(req,res)=>{
        });
 
     } catch (error) {
+      console.log(error);
       return res.status(500).json({
-        success : true,
+        success : false,
         message : error.message
       })
+    }finally{
+      if(req.file){
+        fs.unlinkSync(req.file.path);
+      }
     }
     
 }

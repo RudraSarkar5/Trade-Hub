@@ -33,7 +33,7 @@ export const register = createAsyncThunk(
   }
 );
 export const editProfile = createAsyncThunk(
-  "/action/editProfile",
+  "action/editProfile",
   async function (data) {
     try {
       let response =  axios.put("/user/profile-update", data);
@@ -155,10 +155,6 @@ const userSlice = createSlice({
         state.isLoggedIn = true;
         state.data = action?.payload?.value;
       })
-      .addCase(editProfile.fulfilled,(state,action)=>{
-        state.isLoggedIn = true;
-        state.data = action.payload.value;
-      })
       .addCase(login.fulfilled,(state,action)=>{
         state.isLoggedIn = true;
         state.data = action.payload.value;
@@ -174,6 +170,11 @@ const userSlice = createSlice({
       .addCase(getUserDetails.fulfilled,(state,action)=>{
         state.isLoggedIn = true;
         state.data = action.payload.value;
+      })
+      .addCase(editProfile.fulfilled,(state,action)=>{
+        state.isLoggedIn = true;
+        state.data = action.payload.value;
+        
       })
       
   }

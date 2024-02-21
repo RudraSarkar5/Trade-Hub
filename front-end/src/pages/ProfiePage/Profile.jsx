@@ -30,14 +30,14 @@ const Profile = () => {
   const handleLogOut = async () => {
     const action = await dispatch(logOut());
     if (action.payload?.success) {
-      navigate("/");
+      navigate("/login");
     }
   };
 
   const handleDelete = async () => {
     const action = await dispatch(userDelete());
     if (action.payload?.success) {
-      navigate("/");
+      navigate("/signup");
     }
   };
 

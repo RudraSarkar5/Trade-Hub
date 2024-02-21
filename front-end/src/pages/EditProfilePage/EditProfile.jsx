@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
 import Layout from "../../Layout/Layout";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { editProfile } from "../../redux/userSlice";
 import toast from "react-hot-toast";
 
 const EditProfile = () => {
-
-    const [editProfileData, setEditProfileData] = useState({});
+    const { state } = useLocation();
+    const {name , location} = state;
+    const [editProfileData, setEditProfileData] = useState({
+      name,
+      location
+    });
     const dispatch = useDispatch();
     const navigate = useNavigate();
     
@@ -34,7 +38,6 @@ const EditProfile = () => {
       if (
         !editProfileData.name ||
         !editProfileData.location
-        
       ) {
         toast.error("fill all the field", {
           duration: 1500,
@@ -88,6 +91,7 @@ const EditProfile = () => {
                 Full Name
               </label>
               <input
+                value={editProfileData.name}
                 onChange={handleChange}
                 type="text"
                 name="name"
@@ -100,6 +104,7 @@ const EditProfile = () => {
                 Location
               </label>
               <input
+                value={editProfileData.location}
                 onChange={handleChange}
                 type="text"
                 name="location"
