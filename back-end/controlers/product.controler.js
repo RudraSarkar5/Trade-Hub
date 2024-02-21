@@ -5,38 +5,52 @@ import fs from "fs";
 
 export const getAllProducts = async (req, res) => {
     
-  try {
-    const products = await productModel.find({});
-    if (products.length > 0) {
-      return res.status(200).json({
-        success: true,
-        message: "Products fetched successfully",
-        products,
-      });
-    } else {
-      return res.status(404).json({
-        success: false,
-        message: "No products found",
-      });
+     const { page, limit, starting,numberOfButtonPage } = req.query;
+     console.log(req.query);
+     // Convert query parameters to integers
+     const pageNumber = parseInt(page);
+     const limitNumber = parseInt(limit);
+     const startingNumber = parseInt(starting);
+     const numberOfButtonPageNumber= parseInt(numberOfButtonPage);
+
+     // Calculate the number of documents to skip
+     let skip =  limitNumber*(startingNumber-1);
+
+     // Find products with pagination
+    try {
+       let numberOfButton = await productModel
+         .find({})
+         .skip(skip)
+         .limit(limitNumber  * numberOfButtonPageNumber)
+         .count();
+    
+         numberOfButton = Math.ceil(numberOfButton / limitNumber);
+  
+         skip = (pageNumber-1) * limitNumber;
+  
+       const products = await productModel.find({}).skip(skip).limit(limitNumber);
+       return res.status(200).json({
+         success: true,
+         messgae: "successfully fetched data",
+         products,
+         numberOfButton
+       });
+  
+    } catch (error) {
+      console.log(error);
     }
-  } catch (error) {
-    console.log(error.message);
-    return res.status(500).json({
-      success: false,
-      message: "Error fetching products",
-      error: error.message, 
-    });
-  }
+
 };
 export const getUserProducts = async (req, res) => {
-    const userId = req.user.id;
+    const userId = req.user._id;
   try {
     const products = await productModel.find({userId});
+    console.log("product is " ,products);
     if (products.length > 0) {
       return res.status(200).json({
         success: true,
         message: "Products fetched successfully",
-        products,
+        value : products
       });
     } else {
       return res.status(404).json({
@@ -55,12 +69,14 @@ export const getUserProducts = async (req, res) => {
 };
 
 export const addProduct = async(req,res)=>{
-    const id = req.user.id;
+    const id = req.user._id;
   // this will destructure the req.body object
-  const { name, description, category, price } = req.body;
+  const { productName, description, category, price } = req.body;
+  
 
   //   this will check any field is empty or not if empty then simply send a error response
-  if (!name || !description || !category || !price) {
+  if (!productName || !description || !category || !price) {
+    console.log("enter boys");
     return res.status(401).json({
       success: false,
       message: "please fill all field",
@@ -68,7 +84,9 @@ export const addProduct = async(req,res)=>{
   }
 
   //   if there is lest than three images has uploaded then simply return a error response
+  
   if (req.files.length < 3) {
+    console.log("why enter");
     return res.status(401).json({
       success: false,
       message: "please select atleast 3 images",
@@ -80,11 +98,11 @@ export const addProduct = async(req,res)=>{
 
   try {
     const product = await productModel.create({
-      name,
+      productName,
       description,
       category,
       price,
-      userId: id
+      userId: id,
     });
 
     //   this function will upload all imgaes to cloudinary and simply set all the link to product collection named images array
@@ -106,6 +124,7 @@ export const addProduct = async(req,res)=>{
     return res.status(200).json({
       success: true,
       message: "product added successfully",
+      value:product
     });
   } catch (error) {
     return res.status(500).json({
@@ -113,9 +132,18 @@ export const addProduct = async(req,res)=>{
         message : error.message
     })
   }finally{
-    for(const image of images){
+    try {
+      for (const image of images) {
         fs.unlinkSync(image.path);
+      }
+    }catch (error) {
+      await product.deleteOne();
+      return res.status(500).json({
+        success:false,
+        message : error.message
+      })
     }
+    
   }
 
 }
@@ -128,6 +156,7 @@ export const updateProduct = async(req,res)=>{
     const { name, description, category, price } = req.body;
     //   this will check any field is empty or not if empty then simply send a error response
     if (!name || !description || !category || !price) {
+      
       return res.status(401).json({
         success: false,
         message: "please fill all field",
@@ -191,23 +220,22 @@ export const updateProduct = async(req,res)=>{
 
 export const deleteProduct = async(req,res)=>{
     const {productId} = req.params;
+    console.log(productId);
     try {
         const result = await productModel.findByIdAndDelete(productId);
         if (result) {
           return res.status(200).json({
             success: true,
-            message: "product deleted successfully"
+            message: "product deleted successfully",
+            value : result
           });
-        }else{
-             return res.status(500).json({
-               success: false,
-               message: "product is not deleted "
-             });
         }
+             
+        
     } catch (error) {
         return res.status(500).json({
             success : false,
-            message : error.message
+            message : "what"
         })
     }
     

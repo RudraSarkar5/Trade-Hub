@@ -17,11 +17,11 @@ const CustomRoutes=()=>{
             <Route path='/chat/:id' element={<Chat/>}/>
             <Route path='/login' element={<Login/>} />
             <Route path='/signup' element={<Signup/>} />
-            <Route path='/product-info/:id' element={<ProductInfo/>}/>
-            <Route path='/profile/:id' element={<Profile/>} />
-            <Route path='/profile-update/:id' element={<EditProfile/>} />
+            <Route path='/product-info' element={<ProductInfo/>}/>
+            <Route path='/profile' element={<Profile/>} />
+            <Route path='/profile-update/:productId' element={<EditProfile/>} />
+            <Route path='/product-update' element={<EditProduct/>} />
             <Route path='/contact-us' element={<ContactUs/>} />
-            <Route path='/product-update/:id' element={<EditProduct/>} />
             <Route path='/*' element={<Error/>} />
 
         </Routes>

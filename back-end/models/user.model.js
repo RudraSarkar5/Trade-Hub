@@ -24,12 +24,10 @@ const userSchema = new Schema(
     avatar: {
       secure_url: {
         type: String,
-        default: "./assets/avatar.png"
       },
-      pubilc_id : {
-        type : String,
-
-      }
+      public_id: {
+        type: String,
+      },
     },
   },
   {
