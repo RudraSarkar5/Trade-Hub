@@ -1,6 +1,12 @@
 import LogoImage from "../../assets/favicon.png";
 import { NavLink ,Link } from "react-router-dom";
+import {useSelector} from "react-redux"
 const Navbar = () => {
+
+  const isLoggedIn = useSelector((state)=>state.user.isLoggedIn);
+  
+  
+  
   return (
     <div className="w-screen fixed top-0 z-10  px-1 bg-[#1f5376] py-2 h-fit flex items-center justify-between">
       <Link to="/">
@@ -14,9 +20,15 @@ const Navbar = () => {
         <NavLink to="/">
           <li>Home</li>
         </NavLink>
-        <NavLink to="/profile">
-          <li>Profile</li>
-        </NavLink>
+        {isLoggedIn ? (
+          <NavLink to="/profile">
+            <li>Profile</li>
+          </NavLink>
+        ) : (
+          <NavLink to="/signup">
+            <li>Sign-up</li>
+          </NavLink>
+        )}
         <NavLink to="/contact-us">
           <li>Contact Us</li>
         </NavLink>

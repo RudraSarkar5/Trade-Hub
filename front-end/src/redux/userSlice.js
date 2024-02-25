@@ -1,11 +1,13 @@
 import { createSlice , createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../helper/axiosInstance";
 import toast from "react-hot-toast";
+import { json } from "react-router-dom";
 
-const initialValue = {
-    isLoggedIn : false,
-    data : {}
-}
+const initialState = {
+  isUpToDate : false,
+  isLoggedIn: JSON.parse(localStorage.getItem("isLoggedIn")) || false,
+  data: JSON.parse(localStorage.getItem("userDetails")) || {},
+};
 
 
 
@@ -32,6 +34,8 @@ export const register = createAsyncThunk(
     }
   }
 );
+
+// api call for edit User Profile creation using createAsyncThunk
 export const editProfile = createAsyncThunk(
   "action/editProfile",
   async function (data) {
@@ -76,6 +80,7 @@ export const login = createAsyncThunk(
     }
   }
 );
+// api call for user log out using createAsyncThunk
 export const logOut = createAsyncThunk(
   "/action/logOut",
   async function () {
@@ -97,6 +102,8 @@ export const logOut = createAsyncThunk(
     }
   }
 );
+
+// api call for delete accout using createAsyncThunk
 export const userDelete = createAsyncThunk(
   "/action/userDelete",
   async function () {
@@ -118,6 +125,8 @@ export const userDelete = createAsyncThunk(
     }
   }
 );
+
+// api call to get user details using createAsyncThunk
 export const getUserDetails = createAsyncThunk(
   "action/userDetails",
   async function () {
@@ -147,34 +156,49 @@ export const getUserDetails = createAsyncThunk(
 
 const userSlice = createSlice({
   name: "user",
-  initialState : initialValue,
+  initialState,
   reducers:{},
   extraReducers:(builder)=>{
       builder
       .addCase(register.fulfilled,(state,action)=>{
+        localStorage.setItem("isLoggedIn",true);
+        localStorage.setItem("userDetails",JSON.stringify(action?.payload?.value));
         state.isLoggedIn = true;
         state.data = action?.payload?.value;
+        state.isUpToDate = true;
       })
       .addCase(login.fulfilled,(state,action)=>{
-        state.isLoggedIn = true;
-        state.data = action.payload.value;
+       localStorage.setItem("isLoggedIn", true);
+       localStorage.setItem("userDetails",JSON.stringify(action?.payload?.value));
+       state.isLoggedIn = true;
+       state.data = action?.payload?.value;
+       state.isUpToDate = true;
       })
       .addCase(logOut.fulfilled,(state,action)=>{
+        localStorage.clear();
         state.isLoggedIn = false;
         state.data = {};
+        state.isUpToDate = false;
       })
       .addCase(userDelete.fulfilled,(state,action)=>{
+        localStorage.clear();
         state.isLoggedIn = false;
         state.data = {};
+        state.isUpToDate = false;
       })
       .addCase(getUserDetails.fulfilled,(state,action)=>{
+        localStorage.setItem("isLoggedIn", true);
+        localStorage.setItem("userDetails",JSON.stringify(action?.payload?.value));
         state.isLoggedIn = true;
         state.data = action.payload.value;
+        state.isUpToDate = true;
       })
       .addCase(editProfile.fulfilled,(state,action)=>{
-        state.isLoggedIn = true;
+        localStorage.setItem("isLoggedIn", true);
+        localStorage.setItem("userDetails",JSON.stringify(action?.payload?.value));
         state.data = action.payload.value;
-        
+        state.isLoggedIn=true;
+        state.isUpToDate=true;
       })
       
   }

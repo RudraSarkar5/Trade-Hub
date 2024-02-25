@@ -45,23 +45,29 @@ const Profile = () => {
   const userProducts = useSelector((state) => state?.userProducts);
 
   useEffect(() => {
-    if (userDetail.isLoggedIn) {
-      setUserValue(userDetail.data);
-    } else {
-      dispatch(getUserDetails());
+    if (!userDetail.isUpToDate) {
+      dispatch(getUserDetails()).then((action) => {
+        if (!action.payload?.success) {
+          handleLogOut();
+        }
+      });
     }
-
     if (!userProducts.productLoaded) {
       dispatch(getUserProducts());
-    } else {
-      setProducts(userProducts.products);
     }
-  },[userProducts,userDetail]); 
-  
+  }, [userDetail,userProducts]);
 
   return (
     <Layout>
-      <div className="">{userValue && <UserDetails user={userValue} deleteProfile={handleDelete} logOutProfile={handleLogOut} />}</div>
+      <div className="">
+        {userDetail?.data && (
+          <UserDetails
+            user={userDetail.data}
+            deleteProfile={handleDelete}
+            logOutProfile={handleLogOut}
+          />
+        )}
+      </div>
 
       <ul className="py-2 flex justify-center items-center gap-5">
         <li
@@ -80,7 +86,11 @@ const Profile = () => {
 
       {showProducts ? (
         <div className="product-list gap-5 flex-wrap mb-12 flex-col md:flex-row flex justify-center p-5 w-full min-h-fit">
-           {products.length>0?<ProductList allProduct={products} />:<div className="text-center text-4xl">No Product Found</div> }
+          {userProducts.products.length > 0 ? (
+            <ProductList allProduct={userProducts.products} />
+          ) : (
+            <div className="text-center text-4xl">No Product Found</div>
+          )}
         </div>
       ) : (
         <AddProduct controlShowProduct={handleShowProduct} />

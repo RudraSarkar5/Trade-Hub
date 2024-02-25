@@ -6,6 +6,10 @@ const Card = ({ user = false, value }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const cardClassName = user
+    ? " row-span-1 flex justify-around items-center bg-[#29495b]"
+    : " row-span-2 flex justify-around items-center bg-[#29495b]";
+
   const handleDelete = async (productId) => {
     const action = await dispatch(deleteProduct(productId));
     if (action?.payload?.success) {
@@ -24,7 +28,7 @@ const Card = ({ user = false, value }) => {
           className=" h-[100%] w-[100%]"
         />
       </div>
-      <div className=" row-span-1 flex justify-around items-center bg-[#29495b]">
+      <div className={cardClassName}>
         <p>Price :{value.price}</p>
         <NavLink to="/product-info" state={value}>
           {" "}
@@ -33,19 +37,22 @@ const Card = ({ user = false, value }) => {
           </button>
         </NavLink>
       </div>
-      <div className="  row-span-1 flex justify-around items-center bg-[#29495b]">
-        <NavLink to="/product-update" state={value}>
-         
-          <button className="px-2 py-1 bg-blue-500 text-black hover:bg-green-500 rounded-lg ">
-            Edit
-          </button>
-        </NavLink>
-        
-          <button onClick={()=>handleDelete(value._id)} className="px-2 py-1 bg-red-500 text-black hover:bg-green-500 rounded-lg ">
+      {user && (
+        <div className="  row-span-1 flex justify-around items-center bg-[#29495b]">
+          <NavLink to="/product-update" state={value}>
+            <button className="px-2 py-1 bg-blue-500 text-black hover:bg-green-500 rounded-lg ">
+              Edit
+            </button>
+          </NavLink>
+
+          <button
+            onClick={() => handleDelete(value._id)}
+            className="px-2 py-1 bg-red-500 text-black hover:bg-green-500 rounded-lg "
+          >
             Delete
           </button>
-       
-      </div>
+        </div>
+      )}
     </div>
   );
 };

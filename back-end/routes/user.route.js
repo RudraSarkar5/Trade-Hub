@@ -9,7 +9,7 @@ userRoute.post("/register",upload.single("avatar"),handleMulterError, userRegist
 userRoute.post("/log-in",userLogin);
 userRoute.delete("/delete",isLoggedIn,userDelete);
 userRoute.get("/user-details", isLoggedIn, getUserDetails);
-userRoute.get("/log-out",isLoggedIn,userLogOut);
+userRoute.get("/log-out",userLogOut);
 userRoute.put("/profile-update",upload.single("avatar"),isLoggedIn,userProfileEdit);
 
 export default userRoute;

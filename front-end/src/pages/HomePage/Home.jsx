@@ -48,25 +48,27 @@ const Home = () => {
         </div>
         <div className="product-list gap-5 flex-wrap mb-12 flex-col md:flex-row flex justify-center p-5 w-full min-h-fit">
           <div className="product-list gap-5 flex-wrap mb-12 flex-col md:flex-row flex justify-center p-5 w-full min-h-fit">
-            {products &&
+            {products.length > 0 ? (
               products.map((product, idx) => (
-                <Card key={idx} value={{ ...product }}>
-                </Card>
-              ))}
+                <Card key={idx} value={{ ...product }}></Card>
+              ))
+            ) : (
+              <h1 className="text-4xl text-white text-center">
+                No Products Found
+              </h1>
+            )}
           </div>
         </div>
 
-        <div className="w-full flex justify-center gap-2 items-center bg-slate-500 h-10 mx-2 py-1">
-          {numberOfButtonPage &&
-            (() => {
-               const buttons = [];
+        {numberOfButtonPage > 0 && (
+          <div className="w-full flex justify-center gap-2 items-center bg-slate-500 h-10 mx-2 py-1">
+            {(() => {
+              const buttons = [];
               for (let i = 0; i < numberOfButtonPage; i++) {
-                
-               
-                buttons.push (
+                buttons.push(
                   <button
                     onClick={handleButtonClick}
-                    className="px-2 rounded-lg shadow-lg border-solid border-2  py-1 bg-blue-500 text-black"
+                    className="px-2 rounded-lg shadow-lg border-solid border-2 py-1 bg-blue-500 text-black"
                     value={i + 1}
                     key={i}
                   >
@@ -76,7 +78,8 @@ const Home = () => {
               }
               return buttons;
             })()}
-        </div>
+          </div>
+        )}
       </div>
     </Layout>
   );
