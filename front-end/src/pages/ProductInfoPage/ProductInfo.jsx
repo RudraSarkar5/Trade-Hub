@@ -1,15 +1,17 @@
-import { useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import Layout from "../../Layout/Layout";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const ProductInfo = () => {
-  const {state} = useLocation();
-  const {price,description,images,productName} = state;
-  const [bigImage,setBigImage] = useState(images[0].secure_url);
-  const [proudctImages,setProductImages] = useState([]);
-
- 
+  const { state } = useLocation();
+  const { price, description, images, productName, userId } = state;
+  const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+  const id = userDetails._id;
   
+  const [bigImage, setBigImage] = useState(images[0].secure_url);
+  const [proudctImages, setProductImages] = useState([]);
+
   return (
     <Layout>
       <div className="min-h-screen w-screen px-2  flex gap-5 md:justify-center pt-2 flex-col md:flex-row  ">
@@ -21,18 +23,17 @@ const ProductInfo = () => {
               className="h-full w-full border-2 border-gray-950 p-2"
             />
           </div>
-          {images&&images.map((image,idx)=>(
-               <div key={image.public_id}>
-                 <img
-                   onClick={()=>setBigImage(image.secure_url)}
-                   src={image.secure_url}
-                   alt="product-image"
-                   className="h-full w-full border-2 border-gray-950 p-2"
-                 />
-               </div>
-          ))}
-         
-         
+          {images &&
+            images.map((image, idx) => (
+              <div key={image.public_id}>
+                <img
+                  onClick={() => setBigImage(image.secure_url)}
+                  src={image.secure_url}
+                  alt="product-image"
+                  className="h-full w-full border-2 border-gray-950 p-2"
+                />
+              </div>
+            ))}
         </div>
         <div className="w-full h-fit md:w-[45%] md:h-full   flex flex-col gap-3">
           <div>
@@ -42,15 +43,17 @@ const ProductInfo = () => {
             <h1 className="text-2xl font-bold">Price: {price}</h1>
           </div>
           <div>
-            <p className="text-lg">
-              {description}
-            </p>
+            <p className="text-lg">{description}</p>
           </div>
-          <div className="flex justify-center items-center">
-            <button className=" w-fit p-3 bg-slate-950 text-white shadow-lg rounded-lg ">
-              Connect With Seller
-            </button>
-          </div>
+          {userId != id && (
+            <div className="flex justify-center items-center">
+              <NavLink to={`/chat-box/${userId}`} state={true}>
+                <button className=" w-fit p-3 bg-slate-950 text-white shadow-lg rounded-lg ">
+                  Connect With Seller
+                </button>
+              </NavLink>
+            </div>
+          )}
         </div>
       </div>
     </Layout>

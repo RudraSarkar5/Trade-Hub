@@ -9,12 +9,15 @@ import ContactUs from "../pages/ContactUsPage/ContactUs";
 import Error from "../pages/ErrorPage/Error";
 import EditProduct from "../pages/EditProductPage/EditProduct";
 import EditProfile from "../pages/EditProfilePage/EditProfile";
+import ChatBox from "../components/ChatBox/ChatBox";
 
 const CustomRoutes=()=>{
     return (
         <Routes>
             <Route path='/' element={<Home/>} />
-            <Route path='/chat/:id' element={<Chat/>}/>
+            <Route path='/chat' element={<Chat/>}/>
+            <Route path='/chat-box/:id' element={<ChatBox/>}/>
+
             <Route path='/login' element={<Login/>} />
             <Route path='/signup' element={<Signup/>} />
             <Route path='/product-info' element={<ProductInfo/>}/>

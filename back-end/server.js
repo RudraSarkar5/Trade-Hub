@@ -1,12 +1,36 @@
 import app from "./app.js";
+import {Server} from "socket.io";
 import cloudinary from "cloudinary";
+import http from "http";
 
 import dbconnection from "./dbConfig/dbConfig.js";
 const PORT = process.env.PORT || 5000;
 
-console.log("Before Morgan middleware");
+const server = http.createServer(app);
 
-console.log("After Morgan middleware");
+const io = new Server(server, {
+  cors: {
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  },
+});
+
+
+io.on("connection", (socket) => {
+  socket.on("join", (senderId) => {
+    // Join a room based on the user's ID
+    socket.join(senderId);
+  });
+
+  socket.on("message", ({ message, senderId, receiverId }) => {
+    // Send the message to the receiver
+    io.to(receiverId).emit("message", { senderId, receiverId, message });
+
+    // Send the message to the sender (optional)
+    io.to(senderId).emit("message", { senderId, receiverId, message });
+  });
+
+});
 
 
 cloudinary.v2.config({
@@ -16,7 +40,7 @@ cloudinary.v2.config({
 });
 
 
-app.listen(PORT, async() => {
+server.listen(PORT, async () => {
   await dbconnection();
   console.log(`server is on in http://localhost:${PORT}`);
 });

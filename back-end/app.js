@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 config();
 import userRoute from "./routes/user.route.js";
 import productRoute from "./routes/product.route.js";
+import chatRoute from "./routes/chat.route.js";
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(
 
 app.use("/api/user", userRoute);
 app.use("/api/product", productRoute);
+app.use("/api/chat",chatRoute);
 
 app.use("*", (req, res) => {
   res.status(404).json({

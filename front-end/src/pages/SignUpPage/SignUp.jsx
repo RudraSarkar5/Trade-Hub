@@ -82,7 +82,7 @@ const Signup = () => {
         <form
           onSubmit={handleSubmit}
           encType="multipart/form-data"
-          className="space-y-4"
+          className="space-y-4 text-black"
         >
           <div>
             <label htmlFor="name" className="block ">
