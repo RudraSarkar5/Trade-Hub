@@ -222,6 +222,28 @@ export const getUserDetails = async(req,res)=>{
    
    
 }
+
+export const getSellerDetails = async(req,res)=>{
+   
+   const {sellerId} = req.params;
+   try {
+    const user = await userModel.findById(sellerId);
+      if (user) {
+        return res.status(200).json({
+          success: true,
+          message: "fetched user data.",
+          value : user
+        });
+      }
+   } catch (error) {
+      return res.status(200).json({
+        success: false,
+        message: error.message
+      });
+   }
+   
+   
+}
 export const userDelete = async(req,res)=>{
    const userId = req.user._id;
    console.log(userId);

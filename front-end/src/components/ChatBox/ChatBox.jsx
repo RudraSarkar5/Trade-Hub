@@ -96,10 +96,10 @@ const ChatBox = ({friend=null,chatShow}) => {
   
 
  return (
-   <div className="md:w-2/3 w-full bg-yellow-500 h-[100%]">
+   <div className="md:w-2/3 w-full bg-gray-900 h-[100%]">
      <div className="w-full h-fit p-2 items-center flex gap-2 ">
        <IoMdArrowBack onClick={chatShow} className="md:hidden block"  />
-       <img
+       {/* <img
          src={
            friend.avatar.public_id.length === 0
              ? "./src/assets/avatar.png"
@@ -108,11 +108,11 @@ const ChatBox = ({friend=null,chatShow}) => {
          alt="profile Photo"
          width={25}
          className="rounded-lg"
-       />
+       /> */}
        <h1>{friend && friend.name}</h1>
      </div>
 
-     <div className="w-full bg-gray-500 overflow-y-scroll  h-[80%] space-y-2">
+     <div className="w-full bg-gray-500 overflow-y-scroll h-[85%] md:h-[80%] space-y-2">
                  {allMsg.length > 0 &&
                    allMsg.map((message, idx) => {
                      console.log(message.content);
@@ -132,12 +132,12 @@ const ChatBox = ({friend=null,chatShow}) => {
                    }}
                    type="text"
                    placeholder="write your message"
-                   className="p-2 w-[80%]"
+                   className="p-2 rounded-xl w-[70%] md:w-[80%]"
                    value={msg}
                  />
                  <button
                    onClick={msgSend}
-                   className="bg-blue-500 text-white p-2"
+                   className="bg-blue-800 rounded-lg  text-white py-2 px-4"
                  >
                    send
                  </button>

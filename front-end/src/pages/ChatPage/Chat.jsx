@@ -11,6 +11,14 @@ const Chat = () => {
   const {state} = useLocation();
   
   const friendDetails = state?state.friendDetails:null;
+  const onlyChatBox = state?state.onlyChatBox:null;
+  
+
+  useEffect(() => {
+    if (onlyChatBox) {
+      setShowChat(true);
+    }
+  }, [onlyChatBox]);
   
   const handleClick = () => {
     
@@ -19,12 +27,12 @@ const Chat = () => {
 
   return (
     <Layout>
-      <div className="md:h-[85vh] h-[90vh] w-screen relative flex  bg-green-500">
+      <div className="md:h-[85vh] h-[90vh] w-screen relative flex gap-2  bg-green-900">
         <ChatLeftUi show={showChat} chatShow={handleClick} />
         {showChat ? (
           <ChatBox friend={friendDetails} chatShow={handleClick} />
         ) : (
-          <div className=" bg-green-500 hidden md:flex m-auto">
+          <div className=" bg-green-900 hidden md:flex m-auto">
             Welcome to chat{" "}
           </div>
         )}

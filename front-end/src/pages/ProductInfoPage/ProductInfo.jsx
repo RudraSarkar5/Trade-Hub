@@ -1,16 +1,33 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import Layout from "../../Layout/Layout";
-import { useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "../../helper/axiosInstance";
 
 const ProductInfo = () => {
   const { state } = useLocation();
   const { price, description, images, productName, userId } = state;
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
   const id = userDetails._id;
-  
+  const navigate = useNavigate();
   const [bigImage, setBigImage] = useState(images[0].secure_url);
   const [proudctImages, setProductImages] = useState([]);
+
+  const [seller,setSeller] = useState({});
+
+  const connectWithSeller =()=>{
+     navigate("/chat", { state: { friendDetails: seller, onlyChatBox: true } });
+  }
+  
+
+  useEffect(()=>{
+    async function fetchSeller(){
+      const response = await axios.get(`/user/seller-details/${userId}`);
+      setSeller(response.data.value);
+    }
+    fetchSeller();
+    
+  },[])
 
   return (
     <Layout>
@@ -36,8 +53,17 @@ const ProductInfo = () => {
             ))}
         </div>
         <div className="w-full h-fit md:w-[45%] md:h-full   flex flex-col gap-3">
-          <div>
+          <div className="flex justify-between">
             <h1 className="text-3xl font-bold">{productName}</h1>
+            {userId != id && (
+              <div className="flex justify-center relative mt-5 items-center">
+                
+                  <button onClick={connectWithSeller} className=" w-fit p-3 bg-sky-500 text-white shadow-lg rounded-lg ">
+                    Connect With Seller
+                  </button>
+                
+              </div>
+            )}
           </div>
           <div className="flex justify-center  flex-col gap-2">
             <h1 className="text-2xl font-bold">Price: {price}</h1>
@@ -45,15 +71,6 @@ const ProductInfo = () => {
           <div>
             <p className="text-lg">{description}</p>
           </div>
-          {userId != id && (
-            <div className="flex justify-center items-center">
-              <NavLink to={{pathname:`/chat-box/${userId}`, state:{onlyChatBox:"value"}}}>
-                <button className=" w-fit p-3 bg-slate-950 text-white shadow-lg rounded-lg ">
-                  Connect With Seller
-                </button>
-              </NavLink>
-            </div>
-          )}
         </div>
       </div>
     </Layout>

@@ -5,10 +5,10 @@ import { FaFacebookSquare, FaInstagram, FaTelegram } from "react-icons/fa";
 const ContactUs = () => {
   return (
     <Layout>
-      <div className=" min-h-screen   w-screen flex  flex-col md:flex-row md:justify-center md:items-center  item-center justify-around   px-4  bg-gray-900 text-white">
+      <div className=" h-[80vh]   w-screen flex  flex-col md:flex-row md:justify-center md:items-center  item-center justify-around   px-4   text-white">
         <div className=" md:w-[70vw]  md:flex gap-5 md:justify-center md:flex-row">
-          <div className=" flex gap-3 flex-col  md:justify-center">
-            <div className=" md:self-center flex flex-col gap-5">
+          <div className=" flex gap-1 flex-col  md:justify-center">
+            <div className=" md:self-center flex flex-col gap-2">
               <h1 className="text-4xl text-center font-serif  font-extrabold">
                 Let's Talk
               </h1>
@@ -23,9 +23,9 @@ const ContactUs = () => {
             </div>
           </div>
 
-          <div className="flex gap-5 flex-col   md:items-center md:justify-center w-full ">
+          <div className="flex gap-2 md:gap-5 flex-col   md:items-center md:justify-center w-full ">
             <div className=" md:flex md:justify-center md:items-center">
-              <form className="flex  flex-col  font-mono gap-2">
+              <form className="flex  flex-col  font-mono gap-1 md:gap-3">
                 <label className="font-serif" htmlFor="">
                   What is your Name?
                 </label>
@@ -58,7 +58,7 @@ const ContactUs = () => {
 
             <div className=" flex justify-center items-center flex-col">
               <div className="font-serif">Got connected with</div>
-              <div className="flex gap-5">
+              <div className="flex gap-2 md:gap-5">
                 <FaFacebookSquare />
                 <FaInstagram />
                 <FaTelegram />

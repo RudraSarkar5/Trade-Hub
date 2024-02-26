@@ -1,4 +1,4 @@
-import { Link, NavLink,useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { deleteProduct } from "../../redux/userProductSlice";
 import { useDispatch } from "react-redux";
 
@@ -29,10 +29,10 @@ const Card = ({ user = false, value }) => {
         />
       </div>
       <div className={cardClassName}>
-        <p>Price :{value.price}</p>
+        <p>Price : {value.price}</p>
         <NavLink to="/product-info" state={value}>
           {" "}
-          <button className="px-2 py-1 bg-blue-500 text-black hover:bg-green-500 rounded-lg ">
+          <button className="px-4 py-1 bg-blue-500 text-black hover:bg-green-500 rounded-lg ">
             Info
           </button>
         </NavLink>
