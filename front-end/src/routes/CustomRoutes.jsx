@@ -1,4 +1,4 @@
-import { Routes,Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Home from "../pages/HomePage/Home";
 import Chat from "../pages/ChatPage/Chat";
 import Login from "../pages/LoginPage/Login";
@@ -11,23 +11,22 @@ import EditProduct from "../pages/EditProductPage/EditProduct";
 import EditProfile from "../pages/EditProfilePage/EditProfile";
 import ChatBox from "../components/ChatBox/ChatBox";
 
-const CustomRoutes=()=>{
-    return (
-        <Routes>
-            <Route path='/' element={<Home/>} />
-            <Route path='/chat' element={<Chat/>}/>
-            <Route path='/chat-box/:id' element={<ChatBox/>}/>
+const CustomRoutes = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/chat" element={<Chat />} />
+      <Route path="/chat-box/:id" element={<ChatBox />} />
 
-            <Route path='/login' element={<Login/>} />
-            <Route path='/signup' element={<Signup/>} />
-            <Route path='/product-info' element={<ProductInfo/>}/>
-            <Route path='/profile' element={<Profile/>} />
-            <Route path='/profile-update' element={<EditProfile/>} />
-            <Route path='/product-update' element={<EditProduct/>} />
-            <Route path='/contact-us' element={<ContactUs/>} />
-            <Route path='/*' element={<Error/>} />
-
-        </Routes>
-    )
-}
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/product-info" element={<ProductInfo />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/profile-update" element={<EditProfile />} />
+      <Route path="/product-update" element={<EditProduct />} />
+      <Route path="/contact-us" element={<ContactUs />} />
+      <Route path="/*" element={<Error />} />
+    </Routes>
+  );
+};
 export default CustomRoutes;

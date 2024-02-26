@@ -32,9 +32,11 @@ const Navbar = () => {
         <NavLink to="/contact-us">
           <li>Contact Us</li>
         </NavLink>
-        <NavLink to="/chat">
-          <li>Chat</li>
-        </NavLink>
+        {isLoggedIn && (
+          <Link to="/chat">
+            <li>chat</li>
+          </Link>
+        )}
       </ul>
     </div>
   );

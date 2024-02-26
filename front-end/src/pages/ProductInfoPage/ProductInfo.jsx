@@ -47,7 +47,7 @@ const ProductInfo = () => {
           </div>
           {userId != id && (
             <div className="flex justify-center items-center">
-              <NavLink to={`/chat-box/${userId}`} state={true}>
+              <NavLink to={{pathname:`/chat-box/${userId}`, state:{onlyChatBox:"value"}}}>
                 <button className=" w-fit p-3 bg-slate-950 text-white shadow-lg rounded-lg ">
                   Connect With Seller
                 </button>
