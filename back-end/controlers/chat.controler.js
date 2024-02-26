@@ -2,12 +2,10 @@ import { chatModel } from "../models/chat.model.js"
 import UserModel  from "../models/user.model.js"
 
 export const getFriends=async (req,res)=>{
-<<<<<<< HEAD
+
     console.log("enter");
     const userId = req.user._id;
-=======
-    const {userId} = req.params;
->>>>>>> afc1936a90814618901bff85bd336b8759d6ee8f
+
     const allFriendsId = (await chatModel.find({participant : {$in : [userId]}})).flatMap(({participant})=>participant.filter((id)=>id != userId))
     const correspondingFriends = await UserModel.find({
       _id: { $in: allFriendsId }
