@@ -4,32 +4,29 @@ import ChatLeftUi from "../../components/ChatLeftUi/ChatLeftUi";
 import Layout from "../../Layout/Layout";
 import { useLocation } from "react-router-dom";
 
-
-
 const Chat = () => {
+
   const [showChat, setShowChat] = useState(false);
   
-
   const {state} = useLocation();
   
   const friendDetails = state?state.friendDetails:null;
   
-
   const handleClick = () => {
     
-    setShowChat(true);
+    setShowChat(!showChat);
   };
-
-  
 
   return (
     <Layout>
-      <div className="h-[85vh] w-screen relative flex  bg-green-500">
-        <ChatLeftUi chatShow={handleClick} />
+      <div className="md:h-[85vh] h-[90vh] w-screen relative flex  bg-green-500">
+        <ChatLeftUi show={showChat} chatShow={handleClick} />
         {showChat ? (
-          <ChatBox friend = {friendDetails}  />
+          <ChatBox friend={friendDetails} chatShow={handleClick} />
         ) : (
-          <div className=" bg-green-500 m-auto">Welcome to chat </div>
+          <div className=" bg-green-500 hidden md:flex m-auto">
+            Welcome to chat{" "}
+          </div>
         )}
       </div>
     </Layout>

@@ -4,7 +4,7 @@ import { socket } from "../../helper/socket";
 import axios from "../../helper/axiosInstance";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 
-const ChatLeftUi = ( {chatShow}) => {
+const ChatLeftUi = ( {chatShow,show}) => {
   // const clsName = smallScreen
   //   ? "w-screen h-[90vh] md:hidden  md:w-1/3 bg-red-500"
   //   : "w-screen h-[90vh] hidden md:block  md:w-1/3 bg-red-500";
@@ -36,9 +36,12 @@ const ChatLeftUi = ( {chatShow}) => {
     fetchData();
   }, []); 
 
+  const leftBarClassName = show
+    ? "h-[100%]   md:flex flex-col bg-red-500 hidden md:w-1/3"
+    : "h-[100%]   flex flex-col bg-red-500 w-full md:w-1/3";
   
   return (
-    <div className="h-[100%] flex flex-col bg-red-500 w-1/3">
+    <div className={leftBarClassName}>
       <div className="w-full h-fit bg-gray-600 p-2 items-center flex gap-2 ">
         <Link to="/">
           <IoMdArrowBack />

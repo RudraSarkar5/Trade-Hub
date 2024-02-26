@@ -8,7 +8,7 @@ import { useLocation, useParams } from "react-router-dom";
 import Layout from "../../Layout/Layout";
 import axios from "../../helper/axiosInstance";
 
-const ChatBox = ({friend=null}) => {
+const ChatBox = ({friend=null,chatShow}) => {
    
   const [allMsg,setAllMsg] = useState([]);
   
@@ -96,9 +96,9 @@ const ChatBox = ({friend=null}) => {
   
 
  return (
-   <div className="w-2/3 bg-yellow-500 h-[100%]">
+   <div className="md:w-2/3 w-full bg-yellow-500 h-[100%]">
      <div className="w-full h-fit p-2 items-center flex gap-2 ">
-       <IoMdArrowBack className="md:hidden block"  />
+       <IoMdArrowBack onClick={chatShow} className="md:hidden block"  />
        <img
          src={
            friend.avatar.public_id.length === 0
