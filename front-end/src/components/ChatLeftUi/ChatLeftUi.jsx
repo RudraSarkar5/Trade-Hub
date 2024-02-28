@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { socket } from "../../helper/socket";
 import axios from "../../helper/axiosInstance";
@@ -10,12 +10,19 @@ const ChatLeftUi = ({ chatShow, show }) => {
   //   : "w-screen h-[90vh] hidden md:block  md:w-1/3 bg-red-500";
 
   const [friendList, setFriendList] = useState([]);
+  const [friendActiveId, setFriendActiveId] = useState(null);
+  const divRef = useRef(null);
   const navigate = useNavigate();
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
 
   const handleClickOnFriend = (friend) => {
     navigate("/chat", { state: { friendDetails: friend } });
-    chatShow();
+    setFriendActiveId(friend._id);
+    if(friendActiveId == friend._id){
+      chatShow();
+    }else{
+      chatShow(true)
+    }
   };
 
   useEffect(() => {
@@ -60,9 +67,12 @@ const ChatLeftUi = ({ chatShow, show }) => {
         {friendList.length > 0 &&
           friendList.map((friend, idx) => (
             <div
+              ref={divRef}
               key={friend._id}
               onClick={() => handleClickOnFriend(friend)}
-              className=" w-full h-fit  p-4 items-center flex gap-2 bg-gray-500 rounded-lg "
+              className={`w-full h-fit  p-4 items-center flex gap-2 ${
+                friendActiveId == friend._id ? "bg-sky-700" : "bg-gray-500"
+              } rounded-lg`}
             >
               <img
                 src={

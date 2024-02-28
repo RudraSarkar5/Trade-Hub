@@ -31,6 +31,8 @@ const Profile = () => {
     const action = await dispatch(logOut());
     if (action.payload?.success) {
       navigate("/login");
+      window.location.reload();
+      
     }
   };
 
@@ -38,6 +40,7 @@ const Profile = () => {
     const action = await dispatch(userDelete());
     if (action.payload?.success) {
       navigate("/signup");
+      window.location.reload();
     }
   };
 

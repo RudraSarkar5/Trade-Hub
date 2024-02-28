@@ -12,7 +12,7 @@ const Chat = () => {
   
   const friendDetails = state?state.friendDetails:null;
   const onlyChatBox = state?state.onlyChatBox:null;
-  
+ 
 
   useEffect(() => {
     if (onlyChatBox) {
@@ -20,9 +20,8 @@ const Chat = () => {
     }
   }, [onlyChatBox]);
   
-  const handleClick = () => {
-    
-    setShowChat(!showChat);
+  const handleClick = (value = !showChat) => {
+    setShowChat(value);
   };
 
   return (

@@ -99,7 +99,7 @@ const ChatBox = ({friend=null,chatShow}) => {
    <div className="md:w-2/3 w-full bg-gray-900 h-[100%]">
      <div className="w-full h-fit p-2 items-center flex gap-2 ">
        <IoMdArrowBack onClick={chatShow} className="md:hidden block"  />
-       {/* <img
+       <img
          src={
            friend.avatar.public_id.length === 0
              ? "./src/assets/avatar.png"
@@ -108,7 +108,7 @@ const ChatBox = ({friend=null,chatShow}) => {
          alt="profile Photo"
          width={25}
          className="rounded-lg"
-       /> */}
+       />
        <h1>{friend && friend.name}</h1>
      </div>
 

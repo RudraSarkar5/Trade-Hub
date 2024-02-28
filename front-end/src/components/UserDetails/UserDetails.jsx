@@ -6,7 +6,8 @@ const UserDetails = ({ user, deleteProfile, logOutProfile }) => {
     <div className="p-4 rounded-md shadow-lg bg-blue-200">
       <img
         className="w-32 h-32 rounded-full mx-auto"
-        src={user?.avatar?.secure_url}
+        
+        src = {user&&user?.avatar?.public_id?.length > 0?user?.avatar?.secure_url:"./src/assets/avatar.png"}
         alt="Profile"
       />
       <div className="  flex justify-center items-center relative left-4 gap-2">
