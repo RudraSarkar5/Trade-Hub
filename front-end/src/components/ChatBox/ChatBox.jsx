@@ -7,13 +7,14 @@ import { socket } from "../../helper/socket";
 import { useLocation, useParams } from "react-router-dom";
 import Layout from "../../Layout/Layout";
 import axios from "../../helper/axiosInstance";
+import { makeUpDateFriendList } from "../../redux/chatSlice";
+import { useDispatch } from "react-redux";
 
 const ChatBox = ({friend=null,chatShow}) => {
    
   const [allMsg,setAllMsg] = useState([]);
   
-  // this id refers to receiverId
-  // const {id} = useParams();
+  const dispatch = useDispatch();
 
 
 
@@ -39,7 +40,7 @@ const ChatBox = ({friend=null,chatShow}) => {
       message:msg
     }
 
-    axios.post("/chat/add-message",data).then(()=>console.log("all good")).catch((e)=>console.log(e))
+    axios.post("/chat/add-message",data)
     
     socket.emit("message", {
       message: msg,
@@ -59,7 +60,6 @@ const ChatBox = ({friend=null,chatShow}) => {
         );
 
         if (response.data.success) {
-          console.log(response.data);
           setAllMsg(response.data.messages);
         } else {
           navigate("/signup");
@@ -70,9 +70,19 @@ const ChatBox = ({friend=null,chatShow}) => {
     };
 
     fetchData();
+    
  },[receiverId])
 
+ function scrollToLatestChats() {
+   let chatBox = document.getElementsByClassName("chatBox")[0];
+   console.log("scrollHeight:", chatBox.scrollHeight);
+   console.log("clientHeight:", chatBox.clientHeight);
+   chatBox.scrollTop = chatBox.scrollHeight;
+ }
+
+
   useEffect(() => { 
+     
       // Join a room based on the current user's ID
       socket.emit("join", myId);
 
@@ -84,7 +94,10 @@ const ChatBox = ({friend=null,chatShow}) => {
         };
 
         setAllMsg((msg) => [...msg, msgObj]);
+        dispatch(makeUpDateFriendList({receiverId,message}));
+        
       });
+       console.log("enter useeffect");
        
     return () => {
       // Clean up event listeners
@@ -92,13 +105,17 @@ const ChatBox = ({friend=null,chatShow}) => {
     };
   }, []);
 
+  useEffect(()=>{
+    scrollToLatestChats();
+  },[allMsg])
+
 
   
 
  return (
    <div className="md:w-2/3 w-full bg-gray-900 h-[100%]">
      <div className="w-full h-fit p-2 items-center flex gap-2 ">
-       <IoMdArrowBack onClick={chatShow} className="md:hidden block"  />
+       <IoMdArrowBack onClick={()=>chatShow(false)} className="md:hidden block"  />
        <img
          src={
            friend.avatar.public_id.length === 0
@@ -112,12 +129,12 @@ const ChatBox = ({friend=null,chatShow}) => {
        <h1>{friend && friend.name}</h1>
      </div>
 
-     <div className="w-full bg-gray-500 overflow-y-scroll h-[85%] md:h-[80%] space-y-2">
+     <div className="w-full bg-gray-500 overflow-y-scroll h-[85%] md:h-[80%] chatBox space-y-2">
                  {allMsg.length > 0 &&
                    allMsg.map((message, idx) => {
-                     console.log(message.content);
+                     
                      if (message.senderId == myId) {
-                       console.log("enter to sender");
+                       
                        return <UserMessage key={idx} msg={message.content} />;
                      } else {
                        return <FriedMessage key={idx} msg={message.content} />;

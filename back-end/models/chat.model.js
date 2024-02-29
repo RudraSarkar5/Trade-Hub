@@ -17,10 +17,15 @@ const chatSchema = new mongoose.Schema({
   participant: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref : "User"
+      ref : "user"
     }
   ],
-  messages : [messageSchema]
+  messages : [messageSchema],
+  lastMessage : {
+    type : String
+  }
+},{
+  timestamps : true
 });
 
 export const chatModel = mongoose.model("Chat",chatSchema);

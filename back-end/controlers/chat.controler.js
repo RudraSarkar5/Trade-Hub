@@ -1,22 +1,30 @@
 import { chatModel } from "../models/chat.model.js"
 import UserModel  from "../models/user.model.js"
 
-export const getFriends=async (req,res)=>{
+export const getFriends = async (req, res) => {
+  
+  const userId = req.user._id;
+    
+   const chatFriends = await chatModel.find({participant:userId}).populate({
+      path : "participant",
+      match : {_id : {$ne : userId}},
+      select : "_id name avatar"
+   }).select("lastMessage");
 
-    console.log("enter");
-    const userId = req.user._id;
-
-    const allFriendsId = (await chatModel.find({participant : {$in : [userId]}})).flatMap(({participant})=>participant.filter((id)=>id != userId))
-    const correspondingFriends = await UserModel.find({
-      _id: { $in: allFriendsId }
+   return res.status(200).json({
+    success : true,
+    message : "data fetched successfully",
+    friends : chatFriends
+   })
+ 
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching friends",
+      chatFriends
     });
+  
+};
 
-    return res.status(200).json({
-      success: true,
-      message: "fetched all friends",
-      friends : correspondingFriends
-    });
-}
 
 export const getMessage=async (req,res)=>{
     const {senderId,receiverId} = req.query;
@@ -52,16 +60,19 @@ export const addMessage = async (req, res) => {
     if (conversation) {
       // Conversation exists, add message to existing conversation
       conversation.messages.push(messageDocument);
+      conversation.lastMessage = message;
       await conversation.save();
       return res.status(200).json({
         success: true,
         conversation
       });
     } else {
+
       // Conversation does not exist, create a new conversation
       conversation = await chatModel.create({
         participant: [senderId, receiverId],
-        messages: [messageDocument]
+        messages: [messageDocument],
+        lastMessage : message
       });
 
       return res.status(200).json({
