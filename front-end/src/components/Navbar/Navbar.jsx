@@ -29,7 +29,7 @@ const Navbar = () => {
           dispatch(makeUpdateFriendList({id:receiverId,message}));
         }else{
           dispatch(makeUpdateFriendList({id:senderId,message}));
-
+          
         }
         console.log("Message received:", message);
       });
@@ -41,8 +41,7 @@ const Navbar = () => {
       
 
     return () => {
-      // Clean up socket
-      // socket.disconnect();
+      
     };
   }, [socket]);
   

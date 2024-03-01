@@ -30,16 +30,15 @@ const chatSlice = createSlice({
       const existFriend = state.friends.find(
         (friend) => friend.friendId._id == action.payload.id
       );
-      // console.log(state.friends[0].lastMessage);
       console.log("enter here ");
-      // console.log(existFriend);
-      // console.log(existFriend);
       if (!existFriend) {
         state.needApiCall = true;
       } else {
         existFriend.lastMessage = action.payload.message;
         console.log(existFriend.lastMessage);
         state.upToDate = false;
+        // kind of sab mati.... need to fix it 
+        state.needApiCall=true;
       }
     },
     markAsUnRead(state,action){
