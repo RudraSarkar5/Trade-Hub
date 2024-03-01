@@ -22,42 +22,54 @@ const initialState = {
     friends:[]
 }
 
-const chatSlice = createSlice ({
-    name : "chat",
-    initialState,
-    reducers : {
-        makeUpdateFriendList(state,action){
-            const existFriend = state.friends.find((friend)=>friend.friendId._id == action.payload.id);
-            // console.log(state.friends[0].lastMessage);
-            console.log("enter here ");
-            // console.log(existFriend);
-            // console.log(existFriend);
-            if(!existFriend){
-                state.needApiCall = true;
-            }else{
-              existFriend.lastMessage = action.payload.message;
-              console.log(existFriend.lastMessage);
-              state.upToDate=false;
-            }
-            
-        }
-       
+const chatSlice = createSlice({
+  name: "chat",
+  initialState,
+  reducers: {
+    makeUpdateFriendList(state, action) {
+      const existFriend = state.friends.find(
+        (friend) => friend.friendId._id == action.payload.id
+      );
+      // console.log(state.friends[0].lastMessage);
+      console.log("enter here ");
+      // console.log(existFriend);
+      // console.log(existFriend);
+      if (!existFriend) {
+        state.needApiCall = true;
+      } else {
+        existFriend.lastMessage = action.payload.message;
+        console.log(existFriend.lastMessage);
+        state.upToDate = false;
+      }
     },
-    extraReducers : function (builder){
-        builder
-          .addCase(fetchFriends.fulfilled, function (state, action) {
-            state.friends = action.payload.friends;
-            console.log("enter in fetch friends");
-            console.log(action.payload.friends);
-            state.needApiCall = false;
-            
-          })
-         
-          .addCase(makeRead.fulfilled, function (state, action) {
-
-          })
+    markAsUnRead(state,action){
+      const friendId = action.payload;
+      const existFriend = state.friends.find((friend)=>friend.friendId._id == friendId);
+      if(existFriend){
+        existFriend.unRead = true;
+      }
     }
-})
+  },
+  extraReducers: function (builder) {
+    builder
+      .addCase(fetchFriends.fulfilled, function (state, action) {
+        state.friends = action.payload.friends;
+        console.log("enter in fetch friends");
+        console.log(action.payload.friends);
+        state.needApiCall = false;
+      })
 
-export const { makeUpdateFriendList} = chatSlice.actions;
+      .addCase(makeRead.fulfilled, function (state, action) {
+        let friendId = action.payload.receiverId;
+        const existFriend = state.friends.find(
+          (friend) => friend.friendId._id == friendId
+        );
+        if(existFriend){
+          existFriend.unRead = false;
+        }
+      });
+  },
+});
+
+export const { makeUpdateFriendList, markAsUnRead } = chatSlice.actions;
 export default chatSlice.reducer;

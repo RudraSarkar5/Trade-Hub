@@ -7,7 +7,7 @@ import { socket } from "../../helper/socket";
 import { useLocation, useParams } from "react-router-dom";
 import Layout from "../../Layout/Layout";
 import axios from "../../helper/axiosInstance";
-import { makeRead, makeUpdateFriendList } from "../../redux/chatSlice";
+import { makeRead, makeUpdateFriendList, markAsUnRead } from "../../redux/chatSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 
@@ -56,10 +56,16 @@ const ChatBox = ({ friend = null, chatShow }) => {
         navigate("/signup");
       }
     };
-
+    
+    dispatch(makeRead({senderId:myId,receiverId:friendId}));
     // this function will fetch all message between current friend and user
     fetchData();
   }, [friendId]);
+
+
+  // useEffect(()=>{
+
+  // },[])
 
   useEffect(() => {
     // dispatch(makeRead({senderId:myId,receiverId:friendId}));
@@ -73,14 +79,13 @@ const ChatBox = ({ friend = null, chatShow }) => {
       console.log("message come ", message);
 
       if(myId == senderId || senderId == friendId ){
+        console.log(message,"come message here ");
          setAllMsg(() => [...allMsg, msgObj]);
+      }else{
+        dispatch(markAsUnRead(senderId));
       }
-
-      // this will set latest messge to messages in this message box
       
     });
-
-    // this will automatic disconnect the socket if component unmount
   }, [allMsg, socket]);
 
   function scrollToLatestChats() {

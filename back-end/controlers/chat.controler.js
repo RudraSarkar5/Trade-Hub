@@ -110,11 +110,12 @@ export const addMessage = async (req, res) => {
 
 export const makeRead = async (req, res) => {
   const { receiverId, senderId } = req.body;
+  
   const userFriend = await friendModel.findOne({
     userId: senderId,
     friendId: receiverId,
   });
-console.log(userFriend);
+console.log("mark read",userFriend);
   if (userFriend) {
     userFriend.unRead = false;
     await userFriend.save();
@@ -122,5 +123,6 @@ console.log(userFriend);
   return res.status(200).json({
     success: true,
     message: "all good",
+    receiverId
   });
 };
