@@ -6,7 +6,7 @@ import fs from "fs";
 export const getAllProducts = async (req, res) => {
     
      const { page, limit, starting,numberOfButtonPage } = req.query;
-     console.log(req.query);
+     
      // Convert query parameters to integers
      const pageNumber = parseInt(page);
      const limitNumber = parseInt(limit);
@@ -45,7 +45,7 @@ export const getUserProducts = async (req, res) => {
     const userId = req.user._id;
   try {
     const products = await productModel.find({userId});
-    console.log("product is " ,products);
+   
     if (products.length > 0) {
       return res.status(200).json({
         success: true,
@@ -59,7 +59,7 @@ export const getUserProducts = async (req, res) => {
       });
     }
   } catch (error) {
-    console.log(error.message);
+   
     return res.status(500).json({
       success: false,
       message: "Error fetching products",
@@ -77,7 +77,7 @@ export const addProduct = async(req,res)=>{
 
   //   this will check any field is empty or not if empty then simply send a error response
   if (!productName || !description || !category || !price ) {
-    console.log("enter boys");
+   
     return res.status(401).json({
       success: false,
       message: "please fill all field",
@@ -88,7 +88,7 @@ export const addProduct = async(req,res)=>{
   //   if there is lest than three images has uploaded then simply return a error response
   
   if (req.files.length < 3) {
-    console.log("why enter");
+    
     return res.status(401).json({
       success: false,
       message: "please select atleast 3 images",

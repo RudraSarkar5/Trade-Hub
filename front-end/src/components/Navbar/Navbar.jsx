@@ -1,11 +1,50 @@
 import LogoImage from "../../assets/favicon.png";
 import { NavLink ,Link } from "react-router-dom";
-import {useSelector} from "react-redux"
-const Navbar = () => {
+import {useDispatch, useSelector} from "react-redux"
+import { socket } from "../../helper/socket";
+import { useEffect } from "react";
+import { makeUpdateFriendList } from "../../redux/chatSlice";
 
+const Navbar = () => {
+  
+  const dispatch = useDispatch();
   const isLoggedIn = useSelector((state)=>state.user.isLoggedIn);
+
+  const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+  const myId = userDetails?userDetails._id:null;
+ 
   
+
   
+
+  useEffect(() => {
+    const connectSocket = () => {
+
+        socket.emit("join", myId);
+        console.log("socket conne4ct");
+
+      socket.on("message", ({ senderId, receiverId, message }) => {
+        if(senderId == myId){
+
+          dispatch(makeUpdateFriendList({id:receiverId,message}));
+        }else{
+          dispatch(makeUpdateFriendList({id:senderId,message}));
+
+        }
+        console.log("Message received:", message);
+      });
+    };
+    
+    if (myId){
+      connectSocket();
+    } 
+      
+
+    return () => {
+      // Clean up socket
+      // socket.disconnect();
+    };
+  }, [socket]);
   
   return (
     <div className="w-screen fixed top-0 z-10  px-1 bg-[#1f5376] py-2 h-fit flex items-center justify-between">
@@ -33,9 +72,9 @@ const Navbar = () => {
           <li>Contact Us</li>
         </NavLink>
         {isLoggedIn && (
-          <Link to="/chat">
+          <NavLink to="/chat">
             <li>chat</li>
-          </Link>
+          </NavLink>
         )}
       </ul>
     </div>

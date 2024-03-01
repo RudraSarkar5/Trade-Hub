@@ -12,6 +12,13 @@ const Chat = () => {
   
   const friendDetails = state?state.friendDetails:null;
   const onlyChatBox = state?state.onlyChatBox:null;
+  
+
+  useEffect(()=>{
+    if(!state){
+      setShowChat(false)
+    }
+  },[state])
  
 
   useEffect(() => {
@@ -19,6 +26,8 @@ const Chat = () => {
       setShowChat(true);
     }
   }, [onlyChatBox]);
+
+
   
   const handleClick = (value = !showChat) => {
     setShowChat(value);

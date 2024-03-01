@@ -7,45 +7,52 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchFriends } from "../../redux/chatSlice";
 
 const ChatLeftUi = ({ chatShow, show }) => {
-  
+
   const dispatch = useDispatch();
- 
-
-  const chatList = useSelector((state)=>state.chat);
-
-  const [friendList, setFriendList] = useState([]);
-
-  const [friendActiveId, setFriendActiveId] = useState(null);
-
-  const divRef = useRef(null);
-
   const navigate = useNavigate();
+  
+  // this will track chat state
+  const chatList = useSelector((state) => state.chat);
+  
+  // this state will contain all friends
+  const [friendList, setFriendList] = useState([]);
+ 
+  // this state will keep track the active friend chat 
+  const [friendActiveId, setFriendActiveId] = useState(null);
+  
 
+  
+
+  
+  // this will fetch userDetails from localStorage
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
 
+  
   const handleClickOnFriend = (friend) => {
     navigate("/chat", { state: { friendDetails: friend } });
     setFriendActiveId(friend._id);
-    if(friendActiveId == friend._id){
+    if (friendActiveId == friend._id) {
       chatShow();
-    }else{
-      chatShow(true)
+    } else {
+      chatShow(true);
     }
   };
 
+  useEffect(()=>{
+    setFriendList(chatList.friends);
+  },[chatList.friends])
 
   useEffect(() => {
-    const fetchData = async () => {
-      
-      const action = await dispatch(fetchFriends());
-      console.log("enter");
-      
-      setFriendList(action.payload.friends);
-    };
 
-    fetchData();
+    const fetchData =  () => {
+       dispatch(fetchFriends());
+      // setFriendList(action.payload.friends);
+    };
+      if(chatList.needApiCall){
+        fetchData();
+      }
     
-  }, [chatList.upToDate]);
+  }, [chatList.needApiCall]);
 
   const leftBarClassName = show
     ? "h-[100%]   md:flex flex-col bg-gray-700  hidden md:w-1/3"
@@ -74,30 +81,36 @@ const ChatLeftUi = ({ chatShow, show }) => {
         {friendList.length > 0 &&
           friendList.map((friend, idx) => (
             <div
-              ref={divRef}
-              key={friend.participant[0]._id}
-              onClick={() => handleClickOnFriend(friend.participant[0])}
+              
+              key={friend.friendId._id}
+              onClick={() => handleClickOnFriend(friend.friendId)}
               className={`w-full h-fit  p-4 items-center flex gap-3 ${
-                friendActiveId == friend.participant[0]._id
+                friendActiveId == friend.friendId._id
                   ? "bg-sky-700"
                   : "bg-gray-500"
               } rounded-lg`}
             >
               <img
                 src={
-                  friend.participant[0]?.avatar.public_id.length == 0
+                  friend.friendId?.avatar.public_id.length == 0
                     ? "./src/assets/avatar.png"
-                    : friend.participant[0]?.avatar.secure_url
+                    : friend.friendId?.avatar.secure_url
                 }
                 alt="friendPhoto"
                 width={25}
                 className="rounded-lg"
               />
               <div>
-                <h1 className=" text-xl text-black">
-                  {friend.participant[0].name}
-                </h1>
-                <p className=" text-xs text-white">{friend.lastMessage.substring(0,40)}</p>
+                <h1 className=" text-xl text-black">{friend.friendId.name}</h1>
+                <p
+                  className={` text-xl ${ 
+                    friend.unRead
+                      ? "text-yellow-500 "
+                      : "text-white "
+                  }`}
+                >
+                  {friend.lastMessage}
+                </p>
               </div>
             </div>
           ))}
