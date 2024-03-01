@@ -59,7 +59,11 @@ const ChatBox = ({ friend = null, chatShow }) => {
     
     dispatch(makeRead({senderId:myId,receiverId:friendId}));
     // this function will fetch all message between current friend and user
-    fetchData();
+    if(friendId){
+      fetchData();
+    }
+     
+    
   }, [friendId]);
 
 

@@ -81,12 +81,11 @@ const ChatLeftUi = ({ chatShow, show }) => {
         {friendList.length > 0 &&
           friendList.map((friend, idx) => (
             <div
-              
               key={friend.friendId._id}
               onClick={() => handleClickOnFriend(friend.friendId)}
-              className={`w-full h-fit  p-4 items-center flex gap-3 ${
+              className={`w-full h-fit  p-4 items-center flex gap-3 bg-gray-500 ${
                 friendActiveId == friend.friendId._id
-                  ? "bg-sky-700"
+                  ? "md:bg-sky-700"
                   : "bg-gray-500"
               } rounded-lg`}
             >
@@ -103,10 +102,8 @@ const ChatLeftUi = ({ chatShow, show }) => {
               <div>
                 <h1 className=" text-xl text-black">{friend.friendId.name}</h1>
                 <p
-                  className={` text-xl ${ 
-                    friend.unRead
-                      ? "text-yellow-500 "
-                      : "text-white "
+                  className={` text-xl ${
+                    friend.unRead ? "text-yellow-500 " : "text-white "
                   }`}
                 >
                   {friend.lastMessage}

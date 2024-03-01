@@ -4,40 +4,55 @@ import UserModel from "../models/user.model.js";
 
 export const getFriends = async (req, res) => {
   const userId = req.user._id;
+  
+  try {
+     const chatFriends = await friendModel
+       .find({ userId })
+       .sort({ updatedAt: -1 })
+       .populate({
+         path: "friendId",
+         select: "_id name avatar",
+       })
+       .select("lastMessage unRead");
 
-  const chatFriends = await friendModel
-    .find({ userId })
-    .sort({ updated: -1 })
-    .populate({
-      path: "friendId",
-      select: "_id name avatar",
-    })
-    .select("lastMessage unRead");
-
-
-  return res.status(200).json({
-    success: true,
-    message: "data fetched successfully",
-    friends: chatFriends,
-  });
+     return res.status(200).json({
+       success: true,
+       message: "data fetched successfully",
+       friends: chatFriends,
+     });
+  } catch (error) {
+    console.log(error.message);
+  }
+ 
 };
 
 export const getMessage = async (req, res) => {
   const { senderId, receiverId } = req.query;
-  const conversation = await chatModel.findOne({
-    participant: { $all: [senderId, receiverId] },
-  });
-  if (conversation) {
+  if(receiverId == null){
     return res.status(200).json({
-      success: true,
-      messages: conversation.messages,
-    });
-  } else {
-    return res.status(200).json({
-      success: true,
-      messages: [],
-    });
+      success:false,
+      message : "invalid request"
+    })
   }
+  try {
+    const conversation = await chatModel.findOne({
+      participant: { $all: [senderId, receiverId] },
+    });
+    if (conversation) {
+      return res.status(200).json({
+        success: true,
+        messages: conversation.messages,
+      });
+    } else {
+      return res.status(200).json({
+        success: true,
+        messages: [],
+      });
+    }
+  } catch (error) {
+    console.log(error.message);
+  }
+  
 };
 
 export const addMessage = async (req, res) => {
