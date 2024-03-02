@@ -1,6 +1,5 @@
 import productModel from "../models/product.model.js"
 import cloudinary from "cloudinary";
-import { log } from "console";
 import fs from "fs";
 
 export const getAllProducts = async (req, res) => {
@@ -258,6 +257,16 @@ export const deleteProduct = async(req,res)=>{
         })
     }
     
+}
+
+export const searchProducts = async (req,res)=>{
+  const { searchedProductName } = req.params;
+  console.log(searchedProductName);
+  const products = await productModel.find({productName:{$regex:searchedProductName,$options:"i"}});
+  return res.status(200).json({
+    success :true,
+    products
+  })
 }
 
 

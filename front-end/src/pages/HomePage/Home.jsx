@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Card from "../../components/Card/Card.jsx";
 import Search from "../../components/Search/Search.jsx";
 import Layout from "../../Layout/Layout.jsx";
-import { fetchProducts } from "../../redux/productSlice.js";
+import { fetchProducts,searchedProductName } from "../../redux/productSlice.js";
 import { useDispatch, useSelector } from "react-redux";
 
 import "./Home.css";
@@ -10,13 +10,17 @@ import "./Home.css";
 const Home = () => {
   const dispatch = useDispatch();
 
-  // const [product, setProduct] = useState([]);
+  const [showproducts, setShowproducts] = useState([]);
+  const [searchText, setSearchText] = useState("");
+
   const [pagination, setPagination] = useState({
     limit: 2,
     page: 1,
     numberOfButtonPage: 3,
     starting: 1,
   });
+
+
 
   const { numberOfButtonPage, products, isNextButtonAvailable } = useSelector(
     (state) => state.products
@@ -48,6 +52,15 @@ const Home = () => {
   }
 
   useEffect(() => {
+    console.log(searchText);
+    if (searchText.length == 0) {
+      dispatch(fetchProducts({ ...pagination }));
+    } else {
+      dispatch(searchedProductName(searchText));
+    }
+  }, [searchText]);
+
+  useEffect(() => {
     dispatch(fetchProducts({ ...pagination }));
   }, [pagination]);
 
@@ -55,7 +68,7 @@ const Home = () => {
     <Layout>
       <div className=" flex w-full  flex-wrap min-h-screen justify-center gap-5 ">
         <div className="hero-section h-[40vh] md:h-[80vh] w-full bg-blue-500">
-          <Search />
+          <Search setSearch={setSearchText} />
           <div className=" flex h-full gap-5 justify-center flex-col items-center text-black ">
             <h1 className="md:text-4xl bg-green-600">
               Hey,Buyers Connent With Your Sellers

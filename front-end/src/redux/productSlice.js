@@ -18,6 +18,12 @@ export const fetchProducts = createAsyncThunk(
   }
 );
 
+export const searchedProductName = createAsyncThunk("products/searchedProducts",async function(data){
+  console.log("slice",data); 
+  const response = await axios.get(`product/search-products/${data}`);
+   return response.data;
+})
+
 const productSlice = createSlice({
     name : "products",
     initialState,
@@ -29,6 +35,11 @@ const productSlice = createSlice({
             state.products = action.payload.products;
             state.isNextButtonAvailable = action.payload.isNextButtonAvailable;
 
+        })
+        .addCase(searchedProductName.fulfilled,(state,action)=>{
+          state.numberOfButtonPage = 0;
+          state.products = action.payload.products;
+          state.isNextButtonAvailable = false;
         })
     }
 })
