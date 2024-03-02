@@ -23,7 +23,7 @@ const Card = ({ user = false, value }) => {
       </div>
       <div className=" mx-auto row-span-9 bg-[#5387a6] ">
         <img
-          src={value.images[0].secure_url}
+          src={value?.images[0]?.secure_url}
           alt="product-image"
           className=" h-[100%] w-[100%]"
         />
@@ -31,7 +31,7 @@ const Card = ({ user = false, value }) => {
       <div className={cardClassName}>
         <p>Price : {value.price}</p>
         <NavLink to="/product-info" state={value}>
-          {" "}
+          
           <button className="px-4 py-1 bg-blue-500 text-black hover:bg-green-500 rounded-lg ">
             Info
           </button>

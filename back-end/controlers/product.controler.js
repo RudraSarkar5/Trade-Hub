@@ -77,6 +77,7 @@ export const getUserProducts = async (req, res) => {
 
 export const addProduct = async(req,res)=>{
     const id = req.user._id;
+    
   // this will destructure the req.body object
   const { productName, description, category, price } = req.body;
   
@@ -134,7 +135,7 @@ export const addProduct = async(req,res)=>{
     return res.status(200).json({
       success: true,
       message: "product added successfully",
-      value:product
+      product
     });
   } catch (error) {
     console.log(error.message);
@@ -144,10 +145,14 @@ export const addProduct = async(req,res)=>{
         message : error.message
     })
   }finally{
-   
-      for (const image of images) {
+      try{
+        for (const image of images) {
         fs.unlinkSync(image.path);
-      }    
+      }  
+      }catch(error){
+        console.log(error);
+      }
+        
   }
 
 }

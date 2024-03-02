@@ -291,7 +291,7 @@ export const userProfileEdit = async(req,res)=>{
       
        user.name = name;
        user.location = location;
-       console.log(req.file);
+       
        if (req.file) {
         
           if(user.avatar.public_id.length != 0){
@@ -313,7 +313,7 @@ export const userProfileEdit = async(req,res)=>{
              if(result){
                user.avatar.secure_url = result.secure_url;
                  user.avatar.public_id = result.public_id;
-                 await user.save();
+                 
              }
              
            
@@ -325,6 +325,7 @@ export const userProfileEdit = async(req,res)=>{
            });
          }
        }
+       await user.save();
        return res.status(200).json({
          success: true,
          message: "profile updated successfully",

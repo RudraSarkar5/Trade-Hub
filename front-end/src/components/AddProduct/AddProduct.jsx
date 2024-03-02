@@ -1,12 +1,12 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { addProduct } from "../../redux/userProductSlice";
 
 const AddProduct = ({ controlShowProduct }) => {
   const [productData, setProductData] = useState({});
-
+  const isDone = useSelector((state) => state.userProducts.userProductState);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -17,6 +17,7 @@ const AddProduct = ({ controlShowProduct }) => {
       [name]: value,
     });
   };
+
   const handleImage = (e) => {
     const { files, name } = e.target;
     setProductData({
@@ -24,28 +25,40 @@ const AddProduct = ({ controlShowProduct }) => {
       [name]: files,
     });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!productData.productName || !productData.description || !productData.category || !productData.price || !productData.images) {
+    if (
+      !productData.productName ||
+      !productData.description ||
+      !productData.category ||
+      !productData.price ||
+      !productData.images
+    ) {
       toast.error("please fill all the field");
       console.log("what worng");
       return;
     }
+
     if (productData.images.length < 3) {
       toast.error("please add atleast 3 images");
       return;
     }
 
     const productFormData = new FormData();
+
     productFormData.append("productName", productData.productName);
     productFormData.append("price", productData.price);
     productFormData.append("category", productData.category);
     productFormData.append("description", productData.description);
+
     for (let i = 0; i < productData.images.length; i++) {
       productFormData.append("images", productData.images[i]);
     }
+
     const action = await dispatch(addProduct(productFormData));
-    if (action.payload?.success) {
+
+    if (isDone) {
       navigate("/profile");
       controlShowProduct();
     }
@@ -58,12 +71,13 @@ const AddProduct = ({ controlShowProduct }) => {
           <h1 className="text-2xl font-semibold text-center mb-4">
             Add a New Product
           </h1>
-          <form   onSubmit={handleSubmit} encType="multipart/form-data">
+          <form onSubmit={handleSubmit} encType="multipart/form-data">
             <div className="mb-4">
               <label htmlFor="productName" className="block ">
                 Product Name
               </label>
               <input
+                id="productName"
                 onChange={handleChange}
                 type="text"
                 name="productName"
@@ -75,6 +89,7 @@ const AddProduct = ({ controlShowProduct }) => {
                 Description
               </label>
               <textarea
+                id="description"
                 onChange={handleChange}
                 rows="5"
                 name="description"
@@ -86,6 +101,7 @@ const AddProduct = ({ controlShowProduct }) => {
                 Price
               </label>
               <input
+                id="price"
                 onChange={handleChange}
                 type="number"
                 name="price"
@@ -93,10 +109,11 @@ const AddProduct = ({ controlShowProduct }) => {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="price" className="block ">
+              <label htmlFor="category" className="block ">
                 Category
               </label>
               <input
+                id="category"
                 onChange={handleChange}
                 type="text"
                 name="category"
@@ -105,7 +122,7 @@ const AddProduct = ({ controlShowProduct }) => {
             </div>
             <div className="mb-4">
               <div className="flex  items-center gap-5">
-                <label htmlFor="productImages" className="block ">
+                <label htmlFor="images" className="block ">
                   Images
                 </label>
                 <h2 className=" text-red-600 font-bold">* max 5 images</h2>
@@ -113,6 +130,7 @@ const AddProduct = ({ controlShowProduct }) => {
 
               <input
                 onChange={handleImage}
+                id="images"
                 type="file"
                 name="images"
                 accept="image/*"

@@ -2,32 +2,31 @@ import { createSlice,createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../helper/axiosInstance";
 import toast from "react-hot-toast";
 
-const initialValue = {
+const initialState = {
     productLoaded : false,
+    userProductState : true,
     productNumber : 0,
     products : []
 }
 
 
-export const addProduct =
-    createAsyncThunk("product/addProduct",async function(data){
-        try {
-            let response = axios.post("/product/add-product",data);
-            toast.promise(response,{
-                loading:"creating product...",
-                success:(response)=>response.data.message,
-                error:(error)=>error.response.data.message
-            })
-            response = await response;
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    })
+export const addProduct = createAsyncThunk(
+  "products/addProduct",
+  async function (data) {
+    try {
+      let response = await axios.post("/product/add-product", data);
+      return response.data;
+    } catch (error) {
+        toast.error("failed to add product");
+    }
+  }
+);
+
+
 export const updateProduct = createAsyncThunk(
   "product/updateProduct",
   async function ({productFormData, _id }) {
-    console.log(productFormData,_id);
+    
     try {
       let response = axios.put(
         `/product/update-product/${_id}`,
@@ -48,16 +47,12 @@ export const updateProduct = createAsyncThunk(
 
  export const getUserProducts = createAsyncThunk("/product/userProducts",async function(){
         try {
-          let response = axios.get("/product/user-products");
-          toast.promise(response, {
-            loading: "fetching products...",
-            success: (response) => response.data.message,
-            error: (error) => error.response.data.message,
-          });
-          response = await response;
+          let response = await axios.get("/product/user-products");
+          
+          response =  response;
           return response.data;
         } catch (error) {
-          throw error;
+            toast.error(error.response.data.message)
         }
  });   
  export const deleteProduct = createAsyncThunk(
@@ -85,15 +80,21 @@ export const updateProduct = createAsyncThunk(
 
 const userProductSlice = createSlice({
     name : "products",
-    initialState : initialValue,
+    initialState,
     reducers : {},
     extraReducers:(builder)=>{
         builder
         .addCase(addProduct.fulfilled,(state,action)=>{
-            state.productNumber = state.productNumber + 1;
-            state.products.push(action.payload.value);
-            state.productLoaded=false;
+           state.productLoaded = false;
+           state.userProductState = true;
+           toast.dismiss();
         })
+        .addCase(addProduct.pending,(state,action)=>{
+           toast.loading("createing product bro");
+           state.userProductState=false;
+           
+        })
+        
         .addCase(getUserProducts.fulfilled,(state,action)=>{
          
             state.productLoaded = true;
