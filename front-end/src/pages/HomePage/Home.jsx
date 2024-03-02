@@ -10,15 +10,15 @@ import "./Home.css";
 const Home = () => {
   const dispatch = useDispatch();
 
-  const [product, setProduct] = useState([]);
+  // const [product, setProduct] = useState([]);
   const [pagination, setPagination] = useState({
-    limit: 3,
+    limit: 2,
     page: 1,
-    numberOfButtonPage: 5,
+    numberOfButtonPage: 3,
     starting: 1,
   });
 
-  const { numberOfButtonPage, products } = useSelector(
+  const { numberOfButtonPage, products, isNextButtonAvailable } = useSelector(
     (state) => state.products
   );
 
@@ -29,6 +29,22 @@ const Home = () => {
       page : buttonValue
     })
 
+  }
+
+  const handleNextButton = ()=>{
+    const nextStarting = pagination.starting + pagination.numberOfButtonPage;
+    setPagination({
+      ...pagination,
+      starting : nextStarting
+    })
+  }
+
+  const handlePreviousButton = ()=>{
+    const nextStarting = pagination.starting - pagination.numberOfButtonPage;
+    setPagination({
+      ...pagination,
+      starting: nextStarting,
+    });
   }
 
   useEffect(() => {
@@ -62,6 +78,14 @@ const Home = () => {
 
         {numberOfButtonPage > 0 && (
           <div className="w-full flex justify-center gap-2 items-center bg-slate-500 h-10 mx-2 py-1">
+            {pagination.starting > pagination.numberOfButtonPage ? (
+              <button
+                onClick={handlePreviousButton}
+                className=" bg-blue-500 rounded-lg border-solid border-2 text-white p-1 mr-2"
+              >
+                prev
+              </button>
+            ) : null}
             {(() => {
               const buttons = [];
               for (let i = 0; i < numberOfButtonPage; i++) {
@@ -78,6 +102,14 @@ const Home = () => {
               }
               return buttons;
             })()}
+            {isNextButtonAvailable ? (
+              <button
+                onClick={handleNextButton}
+                className="bg-blue-500 rounded-lg border-solid border-2 text-white p-1 ml-2"
+              >
+                next
+              </button>
+            ) : null}
           </div>
         )}
       </div>

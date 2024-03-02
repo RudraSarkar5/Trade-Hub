@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "../helper/axiosInstance";
 
 const initialState ={
+    isNextButtonAvailable : false,
     numberOfButtonPage : 0,
     products : []
 }
@@ -26,6 +27,7 @@ const productSlice = createSlice({
         .addCase(fetchProducts.fulfilled,(state,action)=>{
             state.numberOfButtonPage = action.payload.numberOfButton;
             state.products = action.payload.products;
+            state.isNextButtonAvailable = action.payload.isNextButtonAvailable;
 
         })
     }

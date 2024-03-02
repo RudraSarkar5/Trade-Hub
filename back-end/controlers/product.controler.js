@@ -9,31 +9,39 @@ export const getAllProducts = async (req, res) => {
      
      // Convert query parameters to integers
      const pageNumber = parseInt(page);
-     const limitNumber = parseInt(limit);
+     const noOfItemPerPage = parseInt(limit);
      const startingNumber = parseInt(starting);
      const numberOfButtonPageNumber= parseInt(numberOfButtonPage);
 
      // Calculate the number of documents to skip
-     let skip =  limitNumber*(startingNumber-1);
+     let skip = noOfItemPerPage * (startingNumber - 1);
 
      // Find products with pagination
     try {
-       let numberOfButton = await productModel
+       const numberOfItemAvailable = await productModel
          .find({})
          .skip(skip)
-         .limit(limitNumber  * numberOfButtonPageNumber)
+         .limit((noOfItemPerPage+1) * numberOfButtonPageNumber)
          .count();
-    
-         numberOfButton = Math.ceil(numberOfButton / limitNumber);
+        
+        const isNextButtonAvailable = (noOfItemPerPage * numberOfButtonPageNumber) < numberOfItemAvailable ; 
+
+        const numberOfButton = isNextButtonAvailable
+          ? numberOfButtonPageNumber
+          : Math.ceil(numberOfItemAvailable / noOfItemPerPage);
   
-         skip = (pageNumber-1) * limitNumber;
+         skip = ((pageNumber*starting) - 1) * noOfItemPerPage;
   
-       const products = await productModel.find({}).skip(skip).limit(limitNumber);
+       const products = await productModel
+         .find({})
+         .skip(skip)
+         .limit(noOfItemPerPage);
        return res.status(200).json({
          success: true,
          messgae: "successfully fetched data",
          products,
-         numberOfButton
+         numberOfButton,
+         isNextButtonAvailable
        });
   
     } catch (error) {
