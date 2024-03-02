@@ -17,6 +17,7 @@ export const makeRead = createAsyncThunk("chat/makeRead", async function (data) 
 });
 
 const initialState = {
+    selectedFriend : null,
     upToDate : false,
     needApiCall : true,
     friends:[]
@@ -30,7 +31,7 @@ const chatSlice = createSlice({
       const existFriend = state.friends.find(
         (friend) => friend.friendId._id == action.payload.id
       );
-      console.log("enter here ");
+      
       if (!existFriend) {
         state.needApiCall = true;
       } else {
@@ -47,6 +48,9 @@ const chatSlice = createSlice({
       if(existFriend){
         existFriend.unRead = true;
       }
+    },
+    makeSelectedFriend(state,action){
+      state.selectedFriend = action.payload;
     }
   },
   extraReducers: function (builder) {
@@ -70,5 +74,6 @@ const chatSlice = createSlice({
   },
 });
 
-export const { makeUpdateFriendList, markAsUnRead } = chatSlice.actions;
+export const { makeUpdateFriendList, markAsUnRead, makeSelectedFriend } =
+  chatSlice.actions;
 export default chatSlice.reducer;

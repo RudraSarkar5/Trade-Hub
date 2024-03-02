@@ -69,7 +69,9 @@ export const addMessage = async (req, res) => {
   if (friendShipExist) {
     friendShipExist.unRead = true;
     friendShipExist.lastMessage = message;
+
     await friendShipExist.save();
+
     const forUser = await friendModel.findOne({
       userId: senderId,
       friendId: receiverId,
@@ -78,6 +80,7 @@ export const addMessage = async (req, res) => {
     forUser.unRead = false;
     forUser.lastMessage = message;
     await forUser.save();
+    
   } else {
     const forUser = await friendModel.create({
       userId: senderId,

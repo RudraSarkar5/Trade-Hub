@@ -130,7 +130,9 @@ export const addProduct = async(req,res)=>{
       value:product
     });
   } catch (error) {
+    console.log(error.message);
     return res.status(500).json({
+        
         success : false,
         message : error.message
     })

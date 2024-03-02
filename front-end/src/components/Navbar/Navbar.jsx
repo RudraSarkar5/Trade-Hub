@@ -31,7 +31,7 @@ const Navbar = () => {
           dispatch(makeUpdateFriendList({id:senderId,message}));
           
         }
-        console.log("Message received:", message);
+        
       });
     };
     

@@ -25,7 +25,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("message", ({ message, senderId, receiverId }) => {
-    console.log(message,"from ",senderId);
+   
     // Send the message to the receiver
     io.to(receiverId).emit("message", { senderId, receiverId, message });
 

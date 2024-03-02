@@ -4,7 +4,7 @@ import { socket } from "../../helper/socket";
 import axios from "../../helper/axiosInstance";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchFriends } from "../../redux/chatSlice";
+import { fetchFriends, makeSelectedFriend } from "../../redux/chatSlice";
 
 const ChatLeftUi = ({ chatShow, show }) => {
 
@@ -29,13 +29,15 @@ const ChatLeftUi = ({ chatShow, show }) => {
 
   
   const handleClickOnFriend = (friend) => {
-    navigate("/chat", { state: { friendDetails: friend } });
-    setFriendActiveId(friend._id);
+    
+    navigate("/chat");
+    dispatch(makeSelectedFriend(friend));
     if (friendActiveId == friend._id) {
       chatShow();
     } else {
       chatShow(true);
     }
+    setFriendActiveId(friend._id);
   };
 
   useEffect(()=>{
@@ -44,9 +46,11 @@ const ChatLeftUi = ({ chatShow, show }) => {
 
   useEffect(() => {
 
-    const fetchData =  () => {
-       dispatch(fetchFriends());
-      // setFriendList(action.payload.friends);
+    const fetchData = async () => {
+      const action = await dispatch(fetchFriends());
+      if(!(action.payload?.success)){
+         navigate("/login")
+      }
     };
       if(chatList.needApiCall){
         fetchData();

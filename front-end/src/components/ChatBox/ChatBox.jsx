@@ -23,9 +23,14 @@ const ChatBox = ({ friend = null, chatShow }) => {
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
   const myId = userDetails._id;
 
+  const currentFriend = useSelector((state)=>state.chat.selectedFriend);
+  console.log(currentFriend);
   // find the receiver Id
-  const friendId = friend ? friend._id : null;
+  let currentFriendId = currentFriend ? currentFriend._id : null;
+   currentFriendId = currentFriendId?currentFriendId:friend._id;
 
+  
+  
   // this function will send message
   const msgSend = async () => {
     if (msg.length == 0) {
@@ -33,7 +38,7 @@ const ChatBox = ({ friend = null, chatShow }) => {
     }
 
     const data = {
-      receiverId: friendId,
+      receiverId: currentFriendId,
       senderId: myId,
       message: msg,
     };
@@ -46,8 +51,10 @@ const ChatBox = ({ friend = null, chatShow }) => {
 
   useEffect(() => {
     const fetchData = async () => {
+      console.log("fetch all data");
+      console.log("receiverId is ", currentFriendId);
       const response = await axios.get(
-        `/chat/get-message?senderId=${myId}&receiverId=${friendId}`
+        `/chat/get-message?senderId=${myId}&receiverId=${currentFriendId}`
       );
 
       if (response.data.success) {
@@ -56,15 +63,15 @@ const ChatBox = ({ friend = null, chatShow }) => {
         navigate("/signup");
       }
     };
-    
-    dispatch(makeRead({senderId:myId,receiverId:friendId}));
+
+    dispatch(makeRead({ senderId: myId, receiverId: currentFriendId }));
     // this function will fetch all message between current friend and user
-    if(friendId){
-      fetchData();
-    }
-     
     
-  }, [friendId]);
+    if (currentFriendId) {
+      fetchData();
+    } else {
+    }
+  }, [currentFriendId]);
 
 
   // useEffect(()=>{
@@ -80,17 +87,24 @@ const ChatBox = ({ friend = null, chatShow }) => {
         senderId,
         content: message,
       };
-      console.log("message come ", message);
+      
 
-      if(myId == senderId || senderId == friendId ){
-        console.log(message,"come message here ");
-         setAllMsg(() => [...allMsg, msgObj]);
-      }else{
+      if (myId != senderId && senderId != currentFriendId._id) {
         dispatch(markAsUnRead(senderId));
+      } else {
+        console.log(
+          "my senderId is ",
+          senderId,
+          "and current Friend is ",
+          currentFriendId
+        );
+        console.log("yes the both are same ");
+        console.log("come message here ");
+        setAllMsg((prev) => [...prev, msgObj]);
       }
       
     });
-  }, [allMsg, socket]);
+  }, [socket]);
 
   function scrollToLatestChats() {
     let chatBox = document.getElementsByClassName("chatBox")[0];
@@ -110,15 +124,15 @@ const ChatBox = ({ friend = null, chatShow }) => {
         />
         <img
           src={
-            friend?.avatar.public_id.length === 0
+            currentFriend?.avatar.public_id.length === 0
               ? "./src/assets/avatar.png"
-              : friend?.avatar.secure_url
+              : currentFriend?.avatar.secure_url
           }
           alt="profile Photo"
           width={25}
           className="rounded-lg"
         />
-        <h1>{friend && friend.name}</h1>
+        <h1>{currentFriend && currentFriend.name}</h1>
       </div>
 
       <div className="w-full bg-gray-500 overflow-y-scroll h-[85%] md:h-[80%] chatBox space-y-2">
