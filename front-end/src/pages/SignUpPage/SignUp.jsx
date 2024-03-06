@@ -6,6 +6,7 @@ import { register } from "../../redux/userSlice";
 import {useNavigate,Link} from "react-router-dom";
 
 const Signup = () => {
+
   const [visible, setVisible] = useState(false);
   const [signUpData, setSignUpData] = useState({});
   const dispatch = useDispatch();
@@ -82,7 +83,7 @@ const Signup = () => {
         <form
           onSubmit={handleSubmit}
           encType="multipart/form-data"
-          className="space-y-4 text-black"
+          className="space-y-4 text-white"
         >
           <div>
             <label htmlFor="name" className="block ">

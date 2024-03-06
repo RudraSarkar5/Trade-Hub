@@ -4,7 +4,7 @@ import fs from "fs";
 import { fileRemoveFromCloud,
         fileRemoveFromDisc,
         fileUploadInCloudinary
-        } from "../utility/fileManage.js";
+       } from "../utility/fileManage.js";
 
 export const getAllProducts = async (req, res) => {
     
