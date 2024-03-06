@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { register } from "../../redux/userSlice";
+import { createAccount } from "../../redux/userSlice";
 import {useNavigate,Link} from "react-router-dom";
+import toast from "react-hot-toast";
+
 
 const Signup = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const [visible, setVisible] = useState(false);
   const [signUpData, setSignUpData] = useState({});
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+ 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,13 +32,12 @@ const Signup = () => {
 
 
   const handleSubmit = async (e) => {
+    console.log("all good");
     e.preventDefault();
 
     // this will check that all field should filled
     if (!signUpData.name || !signUpData.email || !signUpData.password ||!signUpData.location) {
-      toast.error("fill all the field", {
-        duration: 1500,
-      });
+       toast.error("Please Fill All The field...");
       return;
     }
 
@@ -47,9 +48,7 @@ const Signup = () => {
       signUpData.password.length < 6 ||
       signUpData.location.length < 3
     ) {
-      toast.error("lenth of your input should be more", {
-        duration: 2500,
-      });
+      toast.error("Please Fill with proper lenth of you details");
       return;
     }
 
@@ -62,18 +61,14 @@ const Signup = () => {
     if (signUpData.avatar) {
       
       signFormData.append("avatar", signUpData.avatar);
-    }
-    
-   
-      // Dispatch the fetchUsers thunk action and hold the promise
-      
-        const action = await dispatch(register(signFormData));
-        if(action?.payload?.success){
-          navigate("/");
-        }
 
-     
+    }
+       
+      // Dispatch the fetchUsers thunk action and hold the promise
+      dispatch(createAccount(signFormData));
+
 }
+
   return (
     <div className="h-screen  flex justify-center items-center ">
       <div className="p-3 m-3  max-h-screen mt-5 border-white border-2  rounded-md shadow-2xl w-96">

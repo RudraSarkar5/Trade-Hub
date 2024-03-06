@@ -16,7 +16,7 @@ const userRoute = Router();
 // to create user
 userRoute
   .route("/register")
-  .post(upload.single("avatar"),handleMulterError,  userRegister);
+  .post(upload.single("avatar"), handleMulterError, userRegister);
 
 // to login user
 userRoute.route("/login").post(userLogin);

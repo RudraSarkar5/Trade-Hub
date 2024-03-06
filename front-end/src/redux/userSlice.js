@@ -1,7 +1,7 @@
 import { createSlice , createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../helper/axiosInstance";
 import toast from "react-hot-toast";
-import { json } from "react-router-dom";
+
 
 const initialState = {
   isUpToDate : false,
@@ -13,24 +13,15 @@ const initialState = {
 
 
 // api call for user creation using createAsyncThunk
-export const register = createAsyncThunk(
-  "/action/register",
+export const createAccount = createAsyncThunk(
+  "action/register",
   async function (data) {
     try {
-      let response =  axios.post("/user/register", data);
-      toast.promise(response, {
-        loading: "creating account ...",
-        success: (response) => {
-          return response.data?.message;
-        },
-        error: (error) => {
-          return error.response?.data?.message;
-        },
-      });
-       response = await response; 
+      const response = await axios.post("/user/register", data);
+      console.log(response);
       return response.data;
     } catch (error) {
-         throw error;
+         console.log(error);
     }
   }
 );
@@ -160,7 +151,7 @@ const userSlice = createSlice({
   reducers:{},
   extraReducers:(builder)=>{
       builder
-      .addCase(register.fulfilled,(state,action)=>{
+      .addCase(createAccount.fulfilled,(state,action)=>{
         localStorage.setItem("isLoggedIn",true);
         localStorage.setItem("userDetails",JSON.stringify(action?.payload?.value));
         state.isLoggedIn = true;
