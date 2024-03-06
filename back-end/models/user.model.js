@@ -28,6 +28,9 @@ const userSchema = new Schema(
       public_id: {
         type: String,
       },
+      userUploaded : {
+        type : Boolean,
+      }
     },
   },
   {

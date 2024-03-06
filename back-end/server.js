@@ -1,10 +1,16 @@
 import app from "./app.js";
 import {Server} from "socket.io";
-import cloudinary from "cloudinary";
 import http from "http";
+import dotenv from "dotenv";
+dotenv.config();
 
+
+// user defined modules
 import dbconnection from "./dbConfig/dbConfig.js";
+
 const PORT = process.env.PORT || 5000;
+
+
 
 const server = http.createServer(app);
 
@@ -36,14 +42,15 @@ io.on("connection", (socket) => {
 });
 
 
-cloudinary.v2.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 
-server.listen(PORT, async () => {
-  await dbconnection();
-  console.log(`server is on in http://localhost:${PORT}`);
-});
+
+// after db connection server will run 
+dbconnection().then(()=>{
+  server.listen(PORT, ()=>{
+     console.log(`server is on in http://localhost:${PORT}`);
+  })
+}).catch((err)=>{
+  console.log("MongoDb connection failed...");
+})
+

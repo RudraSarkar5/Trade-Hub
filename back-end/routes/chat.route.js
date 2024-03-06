@@ -1,15 +1,17 @@
 import { Router } from "express";
-import {getFriends,getMessage,addMessage, makeRead} from "../controlers/chat.controler.js"
-import {isLoggedIn} from "../middlewares/isLoggedIn.js"
+import {
+  getFriends,
+  getMessage,
+  addMessage,
+  makeRead,
+} from "../controlers/chat.controler.js";
+import { isLoggedIn } from "../middlewares/isLoggedIn.middlewars.js";
 
 const chatRouter = Router();
 
-
-chatRouter.get("/get-friends",isLoggedIn, getFriends);
-chatRouter.post("/add-message",addMessage);
-chatRouter.post("/make-read",makeRead);
-
-chatRouter.get("/get-message",getMessage);
-
+chatRouter.route("/get-friends").get(isLoggedIn, getFriends);
+chatRouter.route("/add-message").post(addMessage);
+chatRouter.route("/make-read").post(makeRead);
+chatRouter.route("/get-message").get(getMessage);
 
 export default chatRouter;

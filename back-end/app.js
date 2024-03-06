@@ -1,15 +1,16 @@
 import express from "express";
-import { config } from "dotenv";
 import morgan from "morgan";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-config();
+
 import userRoute from "./routes/user.route.js";
 import productRoute from "./routes/product.route.js";
 import chatRoute from "./routes/chat.route.js";
+import { handleError } from "./middlewares/handleError.middleware.js";
 
 const app = express();
 
+app.use(express.static("public"));
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(cookieParser());
@@ -30,5 +31,7 @@ app.use("*", (req, res) => {
     message: "Invalid path",
   });
 });
+
+app.use(handleError);
 
 export default app;

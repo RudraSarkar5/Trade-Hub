@@ -2,18 +2,19 @@ import emailValidator from "email-validator";
 import { passwordHashed , comparePassword } from "../utility/password.js";
 import userModel from "../models/user.model.js";
 import { generateJwtToken } from "../utility/jwtAuth.js";
-import cloudinary from "cloudinary";
-import fs from "fs";
-import { log } from "console";
+import AppError from "../utility/customError.js";
+import { fileRemoveFromDisc, fileRemoveFromCloud , fileUploadInCloudinary } from "../utility/fileManage.js";
 
 
 const cookieOption = {
-  maxAge : 24 * 60 * 60 * 1000,
+  maxAge : 24 * 60 * 60 * 1000, // 1 day 
   httpOnly : true
 }
 
-export const userRegister = async (req, res) => {
+export const userRegister = async (req, res , next) => {
   
+  let user = null;
+
   const { name, email, password , location } = req.body;
 
   try {
@@ -28,19 +29,10 @@ export const userRegister = async (req, res) => {
       
       //   this will check the provided email is valid  or not
       if( !emailValidator.validate(email)){
-          res.status(400).json({
-            success: false,
-            message: "Please provide a valid email"
-          });
-          return;
-      }
-
-    //   this will check the length of every field
-      if(name.length < 5 || email.length < 5 || password.length < 6 || location.length < 3){
-         return res.status(400).json({
-           success: false,
-           message: "Please provide valid size of every field",
-         });
+           return res.status(400).json({
+             success: false,
+             message: "Please provide a valid email",
+           });
       }
       
   
@@ -56,57 +48,40 @@ export const userRegister = async (req, res) => {
       }
       
       // making user inputed password hashed
-      const hashedPasword = passwordHashed(password);
+      const hashedPasword = await passwordHashed(password);
 
-    //  at first creating a document in mongodb database and save it 
-    const user = await userModel.create({
+    //at first creating a document in mongodb database and save it 
+    
+    
+  const avatarDocument = {
+    userUploaded: false,
+    secure_url: "/avatar.png",
+    public_id: "",
+  };
+  
+  // if user upload image then it will invoke 
+    if(req.file){
+
+      const result =  await fileUploadInCloudinary(req.file.path);   
+    
+      if(result){
+        avatarDocument.secure_url = result.secure_url;
+        avatarDocument.public_id = result.public_id;
+        avatarDocument.userUploaded = true;
+      }else{
+        throw new AppError(500,"image is not uploaded in cloud");
+        next();
+      }
+              
+    }
+    
+   user = await userModel.create({
       name,
       email,
       password: hashedPasword,
       location,
-      avatar: {
-        secure_url: "./assets/avatar.png",
-        public_id: ""
-      },
+      avatar: avatarDocument,
     });
-    
-  
-  
-  // if user upload image then it will invoke 
-    if(req.file){
-        console.log("enter after");
-        const option = {
-          folder: "Trade_Hub",
-          width: 250,
-          height: 250,
-          crop: "fill",
-          gravity: "center",
-        };
-
-            try {
-              const result =  await cloudinary.v2.uploader.upload( req.file.path,option);
-              if(result){
-                 user.avatar.secure_url = result.secure_url;
-                 user.avatar.public_id = result.public_id;
-                 await user.save();
-              }  
-                
-            } catch (error) {
-              await user.deleteOne();
-              return res.status(500).json({
-                success: false,
-                message: error.message,
-              });
-              
-            } finally {
-              fs.unlinkSync(req.file.path);
-            }
-            
-          
-            
-        
-              
-        }
 
     //  set password undefined before sending back user details to client side
     user.password = undefined;
@@ -126,28 +101,42 @@ export const userRegister = async (req, res) => {
 
 
   } catch (error) {
+
     console.log(error.message);
-    res.status(500).json({
-      success : false,
-      message : error.message
-    })
+
+    if (user){
+      await userModel.deleteOne({ _id: user._id });
+    }
+
+    next( new AppError(500,error.message));
+
+  } finally {
+    
+    // if user upload a file no matter error occures it will clear server disc storage 
+    if(req.file){
+      
+       fileRemoveFromDisc(req.file);
+
+    }
+    
   }
   
   
 };
 
 export const userLogin = async (req, res) => {
+
   const {email,password} = req.body;
-  console.log("value",req.body);
  
     try {
       // this will check that all the field is filled or not
       if (!email || !password) {
-        res.status(400).json({
+
+        return res.status(400).json({
           success: false,
           message: "Please provide all the field",
         });
-        return;
+      
       }
 
       //   this will check the provided email is valid  or not
@@ -158,6 +147,7 @@ export const userLogin = async (req, res) => {
         });
         
       }
+
       // check if  user exist or not
       const user = await userModel.findOne({ email });
 
@@ -171,11 +161,12 @@ export const userLogin = async (req, res) => {
       }
       // if userInputed password does not match with existed password to the co reponding email then invalid password respond send
       if (!comparePassword(password, user.password)) {
+
         return res.status(400).json({
           success: false,
           message: "incorrect password",
         });
-        ;
+    
       }
 
       //  set password undefined before sending back user details to client side
@@ -193,39 +184,48 @@ export const userLogin = async (req, res) => {
         message: "user login succesfully",
         value : user
       });
+
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: "internal server error",
       });
     }
+
 };
 
 export const getUserDetails = async(req,res)=>{
+
    const userId = req.user._id;
-   console.log(userId);
+   
    try {
+
     const user = await userModel.findById(userId);
       if (user) {
+
         return res.status(200).json({
           success: true,
           message: "fetched user data.",
           value : user
         });
+
       }
+
    } catch (error) {
+      
+      console.error(error.message);
       return res.status(200).json({
         success: false,
         message: error.message
       });
    }
    
-   
 }
 
 export const getSellerDetails = async(req,res)=>{
    
    const {sellerId} = req.params;
+
    try {
     const user = await userModel.findById(sellerId);
       if (user) {
@@ -236,38 +236,47 @@ export const getSellerDetails = async(req,res)=>{
         });
       }
    } catch (error) {
+      console.error(error.message);
       return res.status(200).json({
         success: false,
         message: error.message
       });
    }
    
-   
 }
+
 export const userDelete = async(req,res)=>{
+
    const userId = req.user._id;
-   console.log(userId);
+   
    try {
-    const result = await userModel.findByIdAndDelete(userId);
-      if (result) {
+    const user = await userModel.findByIdAndDelete(userId);
+      if (user) {
+
         res.clearCookie("token");
+
         return res.status(200).json({
           success: true,
           message: "account successfully deleted.",
         });
+
       }
    } catch (error) {
+
+      console.error(error.message);
       return res.status(200).json({
         success: false,
         message: error.message
       });
+
    }
-   
    
 }
 
 export const userLogOut = (req,res)=>{
+
    res.clearCookie("token");
+
    return res.status(200).json({
      success: true,
      message: "User logged out successfully",
@@ -276,6 +285,7 @@ export const userLogOut = (req,res)=>{
 }
 
 export const userProfileEdit = async(req,res)=>{
+
     const userId = req.user._id;
     const {name , location} =  req.body;
 
@@ -294,54 +304,61 @@ export const userProfileEdit = async(req,res)=>{
        
        if (req.file) {
         
-          if(user.avatar.public_id.length != 0){
-            await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+          if (user.avatar.userUploaded) {
+
+            fileRemoveFromCloud(user.avatar)
+
           }
         
-         const option = {
-           folder: "Trade_Hub",
-           width: 250,
-           height: 250,
-           crop: "fill",
-           gravity: "center",
-         };
+         
 
          try {
-            const result =  await cloudinary.v2.uploader.upload(
-             req.file.path,
-             option)
-             if(result){
+
+            const result =  await fileUploadInCloudinary(req.file);
+
+            if(result){
                user.avatar.secure_url = result.secure_url;
-                 user.avatar.public_id = result.public_id;
+               user.avatar.public_id = result.public_id;
                  
              }
              
            
          } catch (error) {
+
           console.log(error.message);
            return res.status(500).json({
              success: false,
              message: error.message
            });
          }
+
        }
        await user.save();
+
+       const updatedUserDetails = await userModel.findById(userId);
+
        return res.status(200).json({
          success: true,
          message: "profile updated successfully",
-         value : user
+         value : updatedUserDetails
        });
 
     } catch (error) {
+
       console.log(error);
       return res.status(500).json({
         success : false,
         message : error.message
       })
+
     }finally{
+
       if(req.file){
-        fs.unlinkSync(req.file.path);
+
+        fileRemoveFromDisc(req.file);
+
       }
+
     }
     
 }

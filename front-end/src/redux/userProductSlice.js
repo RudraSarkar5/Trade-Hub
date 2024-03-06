@@ -94,6 +94,11 @@ const userProductSlice = createSlice({
            state.userProductState=false;
            
         })
+        .addCase(addProduct.rejected,(state,action)=>{
+           console.log(action.payload.message);
+           state.userProductState=false;
+           
+        })
         
         .addCase(getUserProducts.fulfilled,(state,action)=>{
          

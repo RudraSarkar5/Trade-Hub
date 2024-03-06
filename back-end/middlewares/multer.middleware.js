@@ -5,17 +5,20 @@ import path from "path";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    
-    cb(null, "./upload/");
+    cb(null, "upload");
   },
   filename: function (req, file, cb) {
-    cb(null, file.fieldname+Date.now()+".jpg");
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    
+    cb(null, file.fieldname+"-" + uniqueSuffix+".jpg");
   },
 });
 
 
 const fileFilter = function (req, file, cb) {
+
   const ext = path.extname(file.originalname).toLowerCase();
+
   const allowedExtensions = [
     ".jpg",
     ".jpeg",
@@ -24,8 +27,11 @@ const fileFilter = function (req, file, cb) {
     ".heif",
     ".webp",
   ]; 
+
   if (allowedExtensions.includes(ext)) {
+
     cb(null, true);
+
   } else {
    
     cb(new Error("File format is not supported"));
