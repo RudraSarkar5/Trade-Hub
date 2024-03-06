@@ -2,9 +2,8 @@ import { useState } from "react";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useDispatch } from "react-redux";
 import { createAccount } from "../../redux/userSlice";
-import {useNavigate,Link} from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
-
 
 const Signup = () => {
   const dispatch = useDispatch();
@@ -12,7 +11,6 @@ const Signup = () => {
 
   const [visible, setVisible] = useState(false);
   const [signUpData, setSignUpData] = useState({});
- 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -30,14 +28,18 @@ const Signup = () => {
     });
   };
 
-
   const handleSubmit = async (e) => {
     console.log("all good");
     e.preventDefault();
 
     // this will check that all field should filled
-    if (!signUpData.name || !signUpData.email || !signUpData.password ||!signUpData.location) {
-       toast.error("Please Fill All The field...");
+    if (
+      !signUpData.name ||
+      !signUpData.email ||
+      !signUpData.password ||
+      !signUpData.location
+    ) {
+      toast.error("Please Fill All The field...");
       return;
     }
 
@@ -57,17 +59,18 @@ const Signup = () => {
     signFormData.append("email", signUpData.email);
     signFormData.append("password", signUpData.password);
     signFormData.append("location", signUpData.location);
-   
+
     if (signUpData.avatar) {
-      
       signFormData.append("avatar", signUpData.avatar);
-
     }
-       
-      // Dispatch the fetchUsers thunk action and hold the promise
-      dispatch(createAccount(signFormData));
 
-}
+    // Dispatch the fetchUsers thunk action and hold the promise
+    const action = await dispatch(createAccount(signFormData));
+    if(action.payload.success){
+      navigate("/")
+    } 
+    
+  };
 
   return (
     <div className="h-screen  flex justify-center items-center ">

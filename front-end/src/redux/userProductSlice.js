@@ -3,8 +3,7 @@ import axios from "../helper/axiosInstance";
 import toast from "react-hot-toast";
 
 const initialState = {
-    productLoaded : false,
-    userProductState : true,
+    needProductReLoad : true,
     productNumber : 0,
     products : []
 }
@@ -14,7 +13,13 @@ export const addProduct = createAsyncThunk(
   "products/addProduct",
   async function (data) {
     try {
-      let response = await axios.post("/product/add-product", data);
+      let response =  axios.post("/product/add-product", data);
+      toast.promise(response,{
+        loading : "creating product...",
+        success : "product created!",
+        error:((error)=>error?.response?.data?.message)
+      })
+      response = await response;
       return response.data;
     } catch (error) {
         toast.error("failed to add product");
@@ -34,29 +39,29 @@ export const updateProduct = createAsyncThunk(
       );
       toast.promise(response, {
         loading: "updating product...",
-        success: (response) => response.data.message,
-        error: (error) => error.response.data.message,
+        success:  "product created successfully",
+        error: ((error) => error?.response?.data?.message)
       });
       response = await response;
       return response.data;
     } catch (error) {
-      throw error;
+        console.error(error.message);
     }
   }
 );
 
- export const getUserProducts = createAsyncThunk("/product/userProducts",async function(){
+// this will fetch all user product
+ export const getUserProducts = createAsyncThunk("product/userProducts",async function(){
         try {
           let response = await axios.get("/product/user-products");
-          
-          response =  response;
           return response.data;
         } catch (error) {
-            toast.error(error.response.data.message)
-        }
- });   
+            console.log(error.message);
+          }
+ });  
+
  export const deleteProduct = createAsyncThunk(
-   "/product/deleteProducts",
+   "product/deleteProducts",
    async function (productId) {
     
      try {
@@ -70,7 +75,7 @@ export const updateProduct = createAsyncThunk(
        response = await response;
        return response.data;
      } catch (error) {
-       throw error;
+        console.log(error.message);
      }
    }
  );   
@@ -84,42 +89,28 @@ const userProductSlice = createSlice({
     reducers : {},
     extraReducers:(builder)=>{
         builder
-        .addCase(addProduct.fulfilled,(state,action)=>{
-           state.productLoaded = false;
-           state.userProductState = true;
-           toast.dismiss();
-        })
-        .addCase(addProduct.pending,(state,action)=>{
-           toast.loading("createing product bro");
-           state.userProductState=false;
-           
-        })
-        .addCase(addProduct.rejected,(state,action)=>{
-           console.log(action.payload.message);
-           state.userProductState=false;
-           
-        })
-        
-        .addCase(getUserProducts.fulfilled,(state,action)=>{
-         
-            state.productLoaded = true;
-            state.productNumber = action.payload.value.length;
-            state.products=action.payload.value;
-        })
-        .addCase(getUserProducts.rejected,(state,action)=>{
-            state.productLoaded = true;
-            state.products=[];
-            state.productNumber=0;
-            
-        })
-        .addCase(deleteProduct.fulfilled,(state,action)=>{
-          state.productLoaded=false;
-            
-        })
-        .addCase(updateProduct.fulfilled,(state,action)=>{
-          state.productLoaded=false;
-            
-        })
+          .addCase(addProduct.fulfilled,(state,action)=>{
+             state.needProductReLoad = true;
+             console.log("fullfilled state");
+          })
+
+          .addCase(getUserProducts.fulfilled, (state, action) => {
+            state.needProductReLoad = false;
+            state.productNumber = action?.payload?.value?.length;
+            state.products = action?.payload?.value;
+          })
+
+          .addCase(getUserProducts.rejected, (state, action) => {
+            state.needProductReLoad = false;
+            state.products = [];
+            state.productNumber = 0;
+          })
+          .addCase(deleteProduct.fulfilled, (state, action) => {
+            state.needProductReLoad = true;
+          })
+          .addCase(updateProduct.fulfilled, (state, action) => {
+            state.needProductReLoad = true;
+          });
     }
 
 })

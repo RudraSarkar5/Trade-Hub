@@ -23,7 +23,7 @@ const Card = ({ user = false, value }) => {
       </div>
       <div className=" mx-auto row-span-9 bg-[#5387a6] ">
         <img
-          src={value?.images[0]?.secure_url}
+          src={value&&value.images[0]?.secure_url}
           alt="product-image"
           className=" h-[100%] w-[100%]"
         />

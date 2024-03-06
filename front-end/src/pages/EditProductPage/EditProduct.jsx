@@ -8,7 +8,7 @@ import Layout from "../../Layout/Layout";
 const EditProduct = () => {
   const {state} =  useLocation();
   const {productName,description,category,price,_id} = state;
-  // console.log(state);
+  
 
   const [productData, setProductData] = useState({
     productName,
@@ -16,7 +16,7 @@ const EditProduct = () => {
     category,
     price
   });
-  // console.log(productData);
+  
 
   const dispatch = useDispatch();
   const navigate = useNavigate();

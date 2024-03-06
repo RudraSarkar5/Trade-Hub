@@ -17,8 +17,14 @@ export const createAccount = createAsyncThunk(
   "action/register",
   async function (data) {
     try {
-      const response = await axios.post("/user/register", data);
-      console.log(response);
+      let response =  axios.post("/user/register", data);
+      toast.promise(response,{
+         loading : "creating account...",
+         success : "created account successfully...",
+         error : ((error)=>error?.response?.data?.message)
+
+      })
+      response = await response;
       return response.data;
     } catch (error) {
          console.log(error);
@@ -51,40 +57,32 @@ export const editProfile = createAsyncThunk(
 
 // api call for user login using createAsyncThunk
 export const login = createAsyncThunk(
-  "/action/login",
+  "action/login",
   async function (data) {
     try {
-      let response =  axios.post("/user/log-in", data);
+      let response =  axios.post("/user/login", data);
       toast.promise(response, {
-        loading: "processing ...",
-        success: (response) => {
-          return response.data?.message;
-        },
-        error: (error) => {
-          return error.response?.data?.message;
-        },
-      });
-       response = await response; 
-       return response.data;
+       loading : "processing...",
+       success : "login successfully...",
+       error: (error) => error?.response?.data?.message,
+     });
+     response = await response;
+     return response.data;
     } catch (error) {
-        throw error;
+        console.log(error.message);
     }
   }
 );
 // api call for user log out using createAsyncThunk
 export const logOut = createAsyncThunk(
-  "/action/logOut",
+  "action/logOut",
   async function () {
     try {
-      let response =  axios.get("/user/log-out");
+      let response =  axios.get("/user/logout");
       toast.promise(response, {
         loading: "processing ...",
-        success: (response) => {
-          return response.data?.message;
-        },
-        error: (error) => {
-          return error.response?.data?.message;
-        },
+        success: "log out successfully...",
+        error: ((error)=>error?.response?.data?.message)
       });
        response = await response; 
        return response.data;
@@ -102,12 +100,9 @@ export const userDelete = createAsyncThunk(
       let response =  axios.delete("/user/delete");
       toast.promise(response, {
         loading: "processing ...",
-        success: (response) => {
-          return response.data?.message;
-        },
-        error: (error) => {
-          return error.response?.data?.message;
-        },
+        success: "account deleted successfully",
+        error:((error)=>error.response?.data?.message)
+        
       });
        response = await response; 
        return response.data;
@@ -125,23 +120,16 @@ export const getUserDetails = createAsyncThunk(
       let response = axios.get("/user/user-details");
       toast.promise(response, {
         loading: "fetching profile data...",
-        success: (response) => {
-          return response.data?.message;
-        },
-        error: (error) => {
-          return error.response?.data?.message;
-        },
-      });
-       response = await response; 
-       return response.data;
+        success : "fetched profile successfully",
+        error: ((error)=> error?.response?.data?.message)
+      })  
+      response = await response;
+      return response.data;
     } catch (error) {
         throw error;
     }
   }
 );
-
-
-
 
 
 
@@ -154,16 +142,16 @@ const userSlice = createSlice({
       .addCase(createAccount.fulfilled,(state,action)=>{
         localStorage.setItem("isLoggedIn",true);
         localStorage.setItem("userDetails",JSON.stringify(action?.payload?.value));
-        state.isLoggedIn = true;
-        state.data = action?.payload?.value;
         state.isUpToDate = true;
+        state.data = action?.payload?.value;
+        state.isLoggedIn = true;
       })
       .addCase(login.fulfilled,(state,action)=>{
        localStorage.setItem("isLoggedIn", true);
        localStorage.setItem("userDetails",JSON.stringify(action?.payload?.value));
-       state.isLoggedIn = true;
-       state.data = action?.payload?.value;
        state.isUpToDate = true;
+       state.data = action?.payload?.value;
+       state.isLoggedIn = true;
       })
       .addCase(logOut.fulfilled,(state,action)=>{
         localStorage.clear();
@@ -187,9 +175,7 @@ const userSlice = createSlice({
       .addCase(editProfile.fulfilled,(state,action)=>{
         localStorage.setItem("isLoggedIn", true);
         localStorage.setItem("userDetails",JSON.stringify(action?.payload?.value));
-        state.data = action.payload.value;
-        state.isLoggedIn=true;
-        state.isUpToDate=true;
+        state.isUpToDate=false;
       })
       
   }

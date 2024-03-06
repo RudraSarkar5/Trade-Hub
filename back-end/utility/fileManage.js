@@ -20,6 +20,7 @@ const ImageOption = {
 // this function will file in cloudinary
 const fileUploadInCloudinary = async (localFilePath) => {
   
+  console.log(localFilePath);
   try {
     
     const response = await cloudinary.v2.uploader.upload(
@@ -31,8 +32,9 @@ const fileUploadInCloudinary = async (localFilePath) => {
     return response;
 
   } catch (error) {
-    
-    return null;
+      
+      console.error(error.message);
+      throw new AppError(500,"image is not uploaded in cloud...");
 
   }
      
@@ -73,12 +75,12 @@ const fileRemoveFromCloud = async (files) => {
 
       for (const file of files) {
 
-        await cloudinary.v2.uploader.destroy(file.pubic_id);
+        await cloudinary.v2.uploader.destroy(file.public_id);
 
       }
     } else {
 
-      await cloudinary.v2.uploader.destroy(files.pubic_id);
+      await cloudinary.v2.uploader.destroy(files.public_id);
 
     }
 

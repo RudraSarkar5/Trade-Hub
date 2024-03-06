@@ -57,8 +57,9 @@ const AddProduct = ({ controlShowProduct }) => {
     }
 
     const action = await dispatch(addProduct(productFormData));
-
-    if (isDone) {
+    console.log(action);
+    if (action?.payload?.success) {
+      console.log("all good");
       navigate("/profile");
       controlShowProduct();
     }

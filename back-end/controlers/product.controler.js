@@ -54,34 +54,27 @@ export const getAllProducts = async (req, res) => {
 };
 
 export const getUserProducts = async (req, res) => {
-
-    const userId = req.user._id;
-
+    
+  const userId = req.user._id;
+  
   try {
 
     const products = await productModel.find({userId});
    
-    if (products.length > 0) {
+    
       return res.status(200).json({
         success: true,
         message: "Products fetched successfully",
         value : products
       });
-    } else {
 
-      return res.status(404).json({
-        success: false,
-        message: "No products found",
-      });
-
-    }
   } catch (error) {
    
     console.log("user product not found ",error.message);
     return res.status(500).json({
       success: false,
-      message: "Error fetching products",
-      error: error.message, 
+      message: "Error fetching products"
+      
     });
   }
 };
@@ -190,7 +183,7 @@ export const updateProduct = async(req,res)=>{
   try {
 
     const product = await productModel.findById(productId);
-
+    
     // this will destructure the req.body object
     const { productName, description, category, price } = req.body;
    
@@ -209,7 +202,7 @@ export const updateProduct = async(req,res)=>{
     
     
 
-    if (req.files.length > 0) {
+    if (req.files.length) {
       //   if there is lest than three images has uploaded then simply return a error response
       if (req.files.length < 3) {
         return res.status(401).json({
@@ -223,32 +216,37 @@ export const updateProduct = async(req,res)=>{
       images = req.files;
       
       //   this function will upload all imgaes to cloudinary and simply set all the link to product collection named images array
-     const uploadImages = async () => {
-      for (const image of images) {
+      const uploadImages = async () => {
+
+        for (const image of images) {
+          
+          const productImage = {};
+
+          const result = await fileUploadInCloudinary(image);
         
-        const productImage = {};
+          if (result) {
+            productImage.secure_url = result.secure_url;
+            productImage.public_id = result.public_id;
+          }
+        
+          product.images.push(productImage);
 
-        const result = await fileUploadInCloudinary(image);
-       
-        if (result) {
-          productImage.secure_url = result.secure_url;
-          productImage.public_id = result.public_id;
         }
-       
-        product.images.push(productImage);
+      };
+    
 
-      }
-    };
-
-    await uploadImages();
+      console.log(product);
+      await uploadImages();
+      
+    }
+    
     await product.save();
-
     return res.status(200).json({
       success: true,
       message: "product updated successfully",
       value : product
     });
-  }
+  
  } catch (error) {
 
   console.log(error);

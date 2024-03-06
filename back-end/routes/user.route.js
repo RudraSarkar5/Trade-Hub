@@ -31,7 +31,7 @@ userRoute.route("/user-details").get(isLoggedIn, getUserDetails);
 userRoute.route("/seller-details/:sellerId").get(getSellerDetails);
 
 // to logout user
-userRoute.route("/logout").get(userLogOut);
+userRoute.route("/logout").get(isLoggedIn,userLogOut);
 
 // to update profile
 userRoute

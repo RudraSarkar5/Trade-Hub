@@ -9,11 +9,11 @@ import AddProduct from "../../components/AddProduct/AddProduct";
 import { Link, useNavigate } from "react-router-dom";
 
 const Profile = () => {
-  const [showProducts, setShowProducts] = useState(true);
-  const [userValue, setUserValue] = useState({});
-  const [products, setProducts] = useState([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [showProducts, setShowProducts] = useState(true);
+  
+  
 
   const handleProductList = () => {
     setShowProducts(true);
@@ -44,28 +44,30 @@ const Profile = () => {
     }
   };
 
-  const userDetail = useSelector((state) => state?.user);
-  const userProducts = useSelector((state) => state?.userProducts);
+  const { data , isUpToDate } = useSelector((state) => state?.user);
+  const { products, needProductReLoad } = useSelector(
+    (state) => state?.userProducts
+  );
 
   useEffect(() => {
-    if (!userDetail.isUpToDate) {
+    if (!isUpToDate) {
       dispatch(getUserDetails()).then((action) => {
         if (!action.payload?.success) {
           handleLogOut();
         }
       });
     }
-    if (!userProducts.productLoaded) {
+    if (needProductReLoad) {
       dispatch(getUserProducts());
     }
-  }, [userDetail,userProducts]);
+  }, [isUpToDate, needProductReLoad]);
 
   return (
     <Layout>
       <div className="">
-        {userDetail?.data && (
+        {data && (
           <UserDetails
-            user={userDetail.data}
+            user={data}
             deleteProfile={handleDelete}
             logOutProfile={handleLogOut}
           />
@@ -89,8 +91,8 @@ const Profile = () => {
 
       {showProducts ? (
         <div className="product-list gap-5 flex-wrap mb-12 flex-col md:flex-row flex justify-center p-5 w-full min-h-fit">
-          {userProducts.products.length > 0 ? (
-            <ProductList allProduct={userProducts.products} />
+          {products?.length > 0 ? (
+            <ProductList allProduct={products} />
           ) : (
             <div className="text-center text-4xl">No Product Found</div>
           )}
