@@ -13,7 +13,8 @@ const friendSchema = new mongoose.Schema({
         type : String
     },
     unRead : {
-        type : Boolean
+        type : Boolean,
+        default : false
     }
 
 },{

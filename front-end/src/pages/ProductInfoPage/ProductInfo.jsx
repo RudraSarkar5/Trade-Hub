@@ -3,27 +3,36 @@ import Layout from "../../Layout/Layout";
 import { useEffect, useId, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "../../helper/axiosInstance";
+import { chatContext } from "../../contexApi/chatContext";
+import { useContext } from "react";
 
 const ProductInfo = () => {
+  const navigate = useNavigate();
+  
   const { state } = useLocation();
+   const { selectedFriend, setSelectedFriend } = useContext(chatContext);
+
   const { price, description, images, productName, userId } = state;
+
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
   const id = userDetails._id;
-  const navigate = useNavigate();
+  
   const [bigImage, setBigImage] = useState(images[0].secure_url);
   const [proudctImages, setProductImages] = useState([]);
 
-  const [seller,setSeller] = useState({});
+  
 
   const connectWithSeller =()=>{
-     navigate("/chat", { state: { friendDetails: seller, onlyChatBox: true } });
+     navigate("/chat", { state: { onlyChatBox: true } });
   }
+
+
   
 
   useEffect(()=>{
     async function fetchSeller(){
       const response = await axios.get(`/user/seller-details/${userId}`);
-      setSeller(response.data.value);
+      setSelectedFriend(response.data.value);
     }
     fetchSeller();
     

@@ -17,7 +17,6 @@ const CustomRoutes = () => {
       <Route path="/" element={<Home />} />
       <Route path="/chat" element={<Chat />} />
       <Route path="/chat-box/:id" element={<ChatBox />} />
-
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/product-info" element={<ProductInfo />} />

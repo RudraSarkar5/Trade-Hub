@@ -3,16 +3,22 @@ import { IoMdArrowBack } from "react-icons/io";
 import { socket } from "../../helper/socket";
 import axios from "../../helper/axiosInstance";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchFriends, makeSelectedFriend } from "../../redux/chatSlice";
+
+
+import { useContext } from "react";
+import { chatContext } from "../../contexApi/chatContext";
 
 const ChatLeftUi = ({ chatShow, show }) => {
 
-  const dispatch = useDispatch();
+  
   const navigate = useNavigate();
+
+  const { friends, setSelectedFriend } = useContext(chatContext);
+
+  
   
   // this will track chat state
-  const chatList = useSelector((state) => state.chat);
+  
   
   // this state will contain all friends
   const [friendList, setFriendList] = useState([]);
@@ -31,7 +37,8 @@ const ChatLeftUi = ({ chatShow, show }) => {
   const handleClickOnFriend = (friend) => {
     
     navigate("/chat");
-    dispatch(makeSelectedFriend(friend));
+    
+    setSelectedFriend(friend);
     if (friendActiveId == friend._id) {
       chatShow();
     } else {
@@ -41,22 +48,12 @@ const ChatLeftUi = ({ chatShow, show }) => {
   };
 
   useEffect(()=>{
-    setFriendList(chatList.friends);
-  },[chatList.friends])
+    setFriendList(friends);
+  },[friends])
 
-  useEffect(() => {
-
-    const fetchData = async () => {
-      const action = await dispatch(fetchFriends());
-      if(!(action.payload?.success)){
-         navigate("/login")
-      }
-    };
-      if(chatList.needApiCall){
-        fetchData();
-      }
+  
     
-  }, [chatList.needApiCall]);
+ 
 
   const leftBarClassName = show
     ? "h-[100%]   md:flex flex-col bg-gray-700  hidden md:w-1/3"
@@ -82,7 +79,7 @@ const ChatLeftUi = ({ chatShow, show }) => {
       </div>
 
       <div className="w-full overflow-y-scroll  h-full space-y-2">
-        {friendList.length > 0 &&
+        {friendList?.length > 0 &&
           friendList.map((friend, idx) => (
             <div
               key={friend.friendId._id}

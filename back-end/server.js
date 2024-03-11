@@ -7,6 +7,7 @@ dotenv.config();
 
 // user defined modules
 import dbconnection from "./dbConfig/dbConfig.js";
+import { makeUnRead } from "./controlers/chat.controler.js";
 
 const PORT = process.env.PORT || 5000;
 
@@ -21,23 +22,37 @@ const io = new Server(server, {
   },
 });
 
+const connectionMap = new Map();
+
+
 
 io.on("connection", (socket) => {
-  console.log("connected user");
+  
   socket.on("join", (senderId) => {
-    console.log("join is ",senderId);
     // Join a room based on the user's ID
     socket.join(senderId);
   });
 
-  socket.on("message", ({ message, senderId, receiverId }) => {
-   
+  socket.on("setConnection",({myId,friendId})=>{
+     connectionMap.set(myId,friendId);
+  });
+  socket.on("destroyConnection",({myId,friendId})=>{
+     connectionMap.delete(myId);
+  });
+  socket.on("message", async ({ message, senderId, receiverId }) => {
+
+    if(!(connectionMap.has(receiverId) && (connectionMap.get(receiverId) == senderId))){
+            await makeUnRead({userId:receiverId,friendId:senderId});
+    }
+    
     // Send the message to the receiver
     io.to(receiverId).emit("message", { senderId, receiverId, message });
 
     // Send the message to the sender (optional)
     io.to(senderId).emit("message", { senderId, receiverId, message });
   });
+
+  
 
 });
 

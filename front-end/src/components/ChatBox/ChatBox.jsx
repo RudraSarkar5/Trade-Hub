@@ -3,18 +3,20 @@ import { IoMdArrowBack } from "react-icons/io";
 import UserMessage from "../Messages/UserMessage";
 import FriedMessage from "../Messages/FriendMessage";
 
-import { socket } from "../../helper/socket";
+// import { socket } from "../../helper/socket";
 import { useLocation, useParams } from "react-router-dom";
 import Layout from "../../Layout/Layout";
 import axios from "../../helper/axiosInstance";
-import { makeRead, makeUpdateFriendList, markAsUnRead } from "../../redux/chatSlice";
-import { useDispatch, useSelector } from "react-redux";
+
+import { useContext } from "react";
+import { chatContext } from "../../contexApi/chatContext";
 
 
 const ChatBox = ({ friend = null, chatShow }) => {
-  const [allMsg, setAllMsg] = useState([]);
+  
+  const { selectedFriend, socket, friends,notification,setNotification} = useContext(chatContext);
 
-  const dispatch = useDispatch();
+  const [allMsg, setAllMsg] = useState([]);
 
   // this state is contain messgae
   const [msg, setMsg] = useState("");
@@ -23,14 +25,13 @@ const ChatBox = ({ friend = null, chatShow }) => {
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
   const myId = userDetails._id;
 
-  const currentFriend = useSelector((state)=>state.chat.selectedFriend);
-  console.log(currentFriend);
+  const currentFriend = selectedFriend;
+  
+
   // find the receiver Id
   let currentFriendId = currentFriend ? currentFriend._id : null;
-   currentFriendId = currentFriendId?currentFriendId:friend._id;
+  
 
-  
-  
   // this function will send message
   const msgSend = async () => {
     if (msg.length == 0) {
@@ -43,66 +44,67 @@ const ChatBox = ({ friend = null, chatShow }) => {
       message: msg,
     };
 
-   await axios.post("/chat/add-message", data);
+    await axios.post("/chat/add-message", data);
     socket.emit("message", data);
 
     setMsg("");
   };
 
   useEffect(() => {
+
+    socket.emit("setConnection",{myId,friendId:currentFriendId});
+
     const fetchData = async () => {
-      console.log("fetch all data");
-      console.log("receiverId is ", currentFriendId);
+      const {data} = await axios.post("/chat/make-read", {
+        senderId: myId,
+        receiverId: currentFriendId,
+      });
+      
+
+      friends.find((friend) => {
+
+        if (friend.friendId._id == data.receiverId) {
+
+          if(friend.unRead == true){
+            friend.unRead = false;
+            setNotification(notification - 1);
+          }
+          
+        }
+      });
+
       const response = await axios.get(
         `/chat/get-message?senderId=${myId}&receiverId=${currentFriendId}`
       );
 
-      if (response.data.success) {
-        setAllMsg(response.data.messages);
-      } else {
-        navigate("/signup");
-      }
+      setAllMsg(response.data.messages);
     };
 
-    dispatch(makeRead({ senderId: myId, receiverId: currentFriendId }));
     // this function will fetch all message between current friend and user
-    
+
     if (currentFriendId) {
       fetchData();
-    } else {
     }
-  }, [currentFriendId]);
 
-
-  // useEffect(()=>{
-
-  // },[])
+    return ()=>{
+      socket.emit("destroyConnection",{myId,friendId:currentFriendId});
+    }
+  }, [selectedFriend]);
 
   useEffect(() => {
-    // dispatch(makeRead({senderId:myId,receiverId:friendId}));
-
     // Listen for incoming messages
     socket.on("message", ({ senderId, receiverId, message }) => {
       const msgObj = {
         senderId,
         content: message,
       };
-      
+      console.log(message);
 
-      if (myId != senderId && senderId != currentFriendId._id) {
-        dispatch(markAsUnRead(senderId));
-      } else {
-        console.log(
-          "my senderId is ",
-          senderId,
-          "and current Friend is ",
-          currentFriendId
-        );
-        console.log("yes the both are same ");
-        console.log("come message here ");
+      if(senderId == myId || senderId == currentFriendId){
+        
         setAllMsg((prev) => [...prev, msgObj]);
       }
-      
+
     });
   }, [socket]);
 

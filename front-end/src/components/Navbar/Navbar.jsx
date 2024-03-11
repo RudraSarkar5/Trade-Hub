@@ -1,49 +1,24 @@
 import LogoImage from "../../assets/favicon.png";
 import { NavLink ,Link } from "react-router-dom";
-import {useDispatch, useSelector} from "react-redux"
-import { socket } from "../../helper/socket";
-import { useEffect } from "react";
-import { makeUpdateFriendList } from "../../redux/chatSlice";
+import {useDispatch,useSelector} from "react-redux"
+import { useContext, useEffect } from "react";
+
+
+import { chatContext } from "../../contexApi/chatContext";
 
 const Navbar = () => {
+  const { socket, notification } = useContext(chatContext);
   
-  const dispatch = useDispatch();
+
   const isLoggedIn = useSelector((state)=>state.user.isLoggedIn);
 
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
   const myId = userDetails?userDetails._id:null;
  
   
-
   
 
-  useEffect(() => {
-    const connectSocket = () => {
 
-        socket.emit("join", myId);
-        console.log("socket conne4ct");
-
-      socket.on("message", ({ senderId, receiverId, message }) => {
-        if(senderId == myId){
-
-          dispatch(makeUpdateFriendList({id:receiverId,message}));
-        }else{
-          dispatch(makeUpdateFriendList({id:senderId,message}));
-          
-        }
-        
-      });
-    };
-    
-    if (myId){
-      connectSocket();
-    } 
-      
-
-    return () => {
-      
-    };
-  }, [socket]);
   
   return (
     <div className="w-screen fixed top-0 z-10  px-1 bg-[#1f5376] py-2 h-fit flex items-center justify-between">
@@ -72,7 +47,7 @@ const Navbar = () => {
         </NavLink>
         {isLoggedIn && (
           <NavLink to="/chat">
-            <li>chat</li>
+            <li className="flex gap-1">chat {notification?(<h1>({notification})</h1>):null} </li>
           </NavLink>
         )}
       </ul>

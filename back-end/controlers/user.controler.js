@@ -112,6 +112,7 @@ export const userRegister = async (req, res, next) => {
 };
 
 export const userLogin = async (req, res) => {
+  console.log("enter");
   const { email, password } = req.body;
 
   try {

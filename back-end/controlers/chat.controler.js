@@ -9,16 +9,22 @@ export const getFriends = async (req, res) => {
      const chatFriends = await friendModel
        .find({ userId })
        .sort({ updatedAt: -1 })
-       .populate({
-         path: "friendId",
-         select: "_id name avatar",
-       })
+       .populate("friendId")
        .select("lastMessage unRead");
 
+       const notificationCount = chatFriends.reduce((total, friend) => {
+         if (friend.unRead) {
+           return total + 1;
+         }
+         return total;
+       }, 0);
+       
+       console.log(chatFriends);
      return res.status(200).json({
        success: true,
        message: "data fetched successfully",
        friends: chatFriends,
+       notification : notificationCount
      });
   } catch (error) {
     console.log(error.message);
@@ -67,7 +73,6 @@ export const addMessage = async (req, res) => {
   
 
   if (friendShipExist) {
-    friendShipExist.unRead = true;
     friendShipExist.lastMessage = message;
 
     await friendShipExist.save();
@@ -77,7 +82,6 @@ export const addMessage = async (req, res) => {
       friendId: receiverId,
     });
 
-    forUser.unRead = false;
     forUser.lastMessage = message;
     await forUser.save();
     
@@ -86,14 +90,12 @@ export const addMessage = async (req, res) => {
       userId: senderId,
       friendId: receiverId,
       lastMessage: message,
-      unRead: false,
     });
 
     const forFriend = await friendModel.create({
       userId: receiverId,
       friendId: senderId,
       lastMessage: message,
-      unRead: true,
     });
 
     await forUser.save();
@@ -143,4 +145,19 @@ console.log("mark read",userFriend);
     message: "all good",
     receiverId
   });
+};
+export const makeUnRead = async ({userId,friendId}) => {
+  
+  
+  
+  const userFriend = await friendModel.findOne({
+    userId,
+    friendId
+  });
+  
+  if (userFriend) {
+    userFriend.unRead = true;
+    await userFriend.save();
+  }
+  
 };
