@@ -1,9 +1,10 @@
 import { createContext, useEffect, useState } from "react";
-import { io } from "socket.io-client";
+// import { io } from "socket.io-client";
 import axios from "../helper/axiosInstance";
+import { socket } from "../helper/socket";
 
 export const chatContext = createContext();
- const socket = io(import.meta.env.VITE_BACK_END_URL);
+//  const socket = io(import.meta.env.VITE_BACK_END_URL);
 
 const ContextProvider = ({ children }) => {
  
@@ -18,7 +19,7 @@ const ContextProvider = ({ children }) => {
 
   const fetchFriends = async () => {
     try {
-      socket.emit("join", myId);
+      
       console.log("connected socket");
       const response = await axios.get("/chat/get-friends");
       const { friends, notification } = response.data; 
@@ -29,16 +30,28 @@ const ContextProvider = ({ children }) => {
     }
   };
 
+  
+
+
   useEffect(() => {
     const fetchData = async () => {
       if (myId) {
+        socket.emit("join", myId);
         await fetchFriends();
-        socket.on("message",async ({receiverId,senderId,message})=>{
-          await fetchFriends();
-        })
+        
       }
     };
+
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    socket.on("message", async ({ receiverId, senderId, message }) => {
+      await fetchFriends();
+    });
+    return ()=>{
+      socket.off("message");
+    }
   }, [socket]);
 
   return (

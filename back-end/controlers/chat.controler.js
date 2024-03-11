@@ -19,7 +19,7 @@ export const getFriends = async (req, res) => {
          return total;
        }, 0);
        
-       console.log(chatFriends);
+       
      return res.status(200).json({
        success: true,
        message: "data fetched successfully",
@@ -135,7 +135,7 @@ export const makeRead = async (req, res) => {
     userId: senderId,
     friendId: receiverId,
   });
-console.log("mark read",userFriend);
+
   if (userFriend) {
     userFriend.unRead = false;
     await userFriend.save();

@@ -7,7 +7,7 @@ import { useContext, useEffect } from "react";
 import { chatContext } from "../../contexApi/chatContext";
 
 const Navbar = () => {
-  const { socket, notification } = useContext(chatContext);
+  const {  notification } = useContext(chatContext);
   
 
   const isLoggedIn = useSelector((state)=>state.user.isLoggedIn);

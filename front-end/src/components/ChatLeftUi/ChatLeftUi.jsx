@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
-import { socket } from "../../helper/socket";
 import axios from "../../helper/axiosInstance";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 

@@ -40,9 +40,11 @@ io.on("connection", (socket) => {
      connectionMap.delete(myId);
   });
   socket.on("message", async ({ message, senderId, receiverId }) => {
-
+     console.log(connectionMap);
     if(!(connectionMap.has(receiverId) && (connectionMap.get(receiverId) == senderId))){
             await makeUnRead({userId:receiverId,friendId:senderId});
+            console.log("enter here ");
+            
     }
     
     // Send the message to the receiver

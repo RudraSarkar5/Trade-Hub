@@ -98,7 +98,7 @@ const ChatBox = ({ friend = null, chatShow }) => {
         senderId,
         content: message,
       };
-      console.log(message);
+      
 
       if(senderId == myId || senderId == currentFriendId){
         
