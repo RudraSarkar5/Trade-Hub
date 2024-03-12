@@ -86,10 +86,26 @@ const ChatBox = ({ friend = null, chatShow }) => {
       fetchData();
     }
 
-    return ()=>{
-      socket.emit("destroyConnection",{myId,friendId:currentFriendId});
-    }
+    // return ()=>{
+    //   socket.emit("destroyConnection",{myId,friendId:currentFriendId});
+    // }
   }, [selectedFriend]);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // Emit the destroyConnection event
+      socket.emit("destroyConnection", { myId, friendId: currentFriendId });
+    };
+
+    // Add the event listener
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // Clean up the event listener
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [socket, myId, currentFriendId]);
+
 
   useEffect(() => {
     // Listen for incoming messages

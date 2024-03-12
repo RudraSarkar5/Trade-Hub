@@ -47,7 +47,7 @@ const Navbar = () => {
         </NavLink>
         {isLoggedIn && (
           <NavLink to="/chat">
-            <li className="flex gap-1">chat {notification?(<h1>({notification})</h1>):null} </li>
+            <li className="flex gap-1">chat {notification?(<h1 className="text-yellow-500">({notification})</h1>):null} </li>
           </NavLink>
         )}
       </ul>
