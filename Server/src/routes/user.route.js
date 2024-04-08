@@ -7,8 +7,11 @@ import {
   userProfileEdit,
   getUserDetails,
   getSellerDetails,
-} from "../controlers/user.controler.js";
-import { handleMulterError, upload } from "../middlewares/multer.middleware.js";
+} from "../controllers/user.controller.js";
+import {
+  handleMulterError,
+  upload,
+} from "../middlewares/multer.middleware.js";
 import { isLoggedIn } from "../middlewares/isLoggedIn.middlewars.js";
 
 const userRoute = Router();
@@ -31,12 +34,11 @@ userRoute.route("/user-details").get(isLoggedIn, getUserDetails);
 userRoute.route("/seller-details/:sellerId").get(getSellerDetails);
 
 // to logout user
-userRoute.route("/logout").get(isLoggedIn,userLogOut);
+userRoute.route("/logout").get(isLoggedIn, userLogOut);
 
 // to update profile
 userRoute
   .route("/profile-update")
   .put(upload.single("avatar"), isLoggedIn, userProfileEdit);
 
-  
 export default userRoute;

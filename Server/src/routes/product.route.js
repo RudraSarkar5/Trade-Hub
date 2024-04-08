@@ -6,15 +6,18 @@ import {
   getUserProducts,
   searchProducts,
   updateProduct,
-} from "../controlers/product.controler.js";
+} from "../controllers/product.controller.js";
 
-import { handleMulterError, upload } from "../middlewares/multer.middleware.js";
+import {
+  handleMulterError,
+  upload,
+} from "../middlewares/multer.middleware.js";
 
 import { isLoggedIn } from "../middlewares/isLoggedIn.middlewars.js";
 
 const productRoute = Router();
 
-// to get all products in home page 
+// to get all products in home page
 productRoute.route("/all-products").get(getAllProducts);
 
 // to search products

@@ -4,7 +4,7 @@ import {
   getMessage,
   addMessage,
   makeRead,
-} from "../controlers/chat.controler.js";
+} from "../controllers/chat.controller.js";
 import { isLoggedIn } from "../middlewares/isLoggedIn.middlewars.js";
 
 const chatRouter = Router();

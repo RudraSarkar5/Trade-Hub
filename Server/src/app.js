@@ -10,20 +10,20 @@ import { handleError } from "./middlewares/handleError.middleware.js";
 
 const app = express();
 
-app.use(express.static("public"));
-app.use(express.json());
-app.use(morgan("dev"));
-app.use(cookieParser());
 app.use(
   cors({
     origin: [process.env.FRONTEND_URL],
-    credentials:true
+    credentials: true,
   })
 );
+app.use(express.json());
+app.use(morgan("dev"));
+app.use(cookieParser());
+
 
 app.use("/api/user", userRoute);
 app.use("/api/product", productRoute);
-app.use("/api/chat",chatRoute);
+app.use("/api/chat", chatRoute);
 
 app.use("*", (req, res) => {
   res.status(404).json({
