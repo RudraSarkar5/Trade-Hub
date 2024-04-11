@@ -10,10 +10,11 @@ import {
   fileUploadInCloudinary,
 } from "../utility/fileManage.js";
 import { cookieOption } from "../constants.js";
-import cloudinary from "cloudinary";
+
 
 
 export const userRegister = async (req, res, next) => {
+
   let user = null;
   let result = null;
 
@@ -59,15 +60,18 @@ export const userRegister = async (req, res, next) => {
 
     // if user upload image then it will invoke
     if (req.file) {
-       result = await fileUploadInCloudinary(req.file,user._id);
+       result = await fileUploadInCloudinary(req.file);
 
       if (result) {
         user.avatar.secure_url = result.secure_url;
         user.avatar.public_id = result.public_id;
         user.avatar.userUploaded = true;
       } else {
+
         throw new AppError("image is not uploaded in cloud", 500);
+
       }
+
     }
 
     //  set password undefined before sending back user details to client side
@@ -84,8 +88,9 @@ export const userRegister = async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: "Account successfully created...",
-      value: user,
+      user,
     });
+
   } catch (error) {
 
     if(result){
@@ -99,11 +104,16 @@ export const userRegister = async (req, res, next) => {
     next(error);
 
   } finally {
+
     // if user upload a file no matter error occures it will clear server disc storage
     if (req.file) {
+
       fileRemoveFromDisc(req.file);
+
     }
+
   }
+
 };
 
 export const userLogin = async (req, res, next) => {
@@ -154,59 +164,112 @@ export const userLogin = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: "user login succesfully",
-      data : user,
+      user,
     });
+
   } catch (error) {
+
     next(error);
+
   }
+
 };
 
 export const getUserDetails = async (req, res, next) => {
+
   const userId = req.user._id;
 
   try {
+
     const user = await userModel.findById(userId);
+
     if (user) {
+
       return res.status(200).json({
         success: true,
         message: "fetched user data.",
-        data : user,
+        user,
       });
+
     }
+
   } catch (error) {
     
     next(error);
    
   }
+
 };
 
 export const getSellerDetails = async (req, res, next) => {
+
   const { id } = req.params;
 
   try {
+
     const user = await userModel.findById(id);
+
     if (user) {
+
       return res.status(200).json({
         success: true,
         message: "fetched user data.",
-        data : user,
+        user,
       });
+
     }else {
+
       throw new AppError("user not found",400);
+
     }
+
   } catch (error) {
+
     next(error);
+
   }
+
 };
 
 export const userDelete = async (req, res, next) => {
+
   const userId = req.user._id;
  
   try {
 
-    const products = await productModel.deleteMany({userId});
-    await cloudinary.v2.api.delete_resources_by_prefix(`${userId}/`);
+    const products = await productModel.find({userId});
+
+    await productModel.deleteMany({userId});
+    
     const user = await userModel.findByIdAndDelete(userId);
+
+    await fileRemoveFromCloud(user.avatar.public_id);
+
+     const productImages = products.reduce((acc, product) => { 
+
+       product.images.forEach((image) => {
+         acc.push(image.public_id);
+       });
+
+       return acc;
+
+     }, []);
+
+
+     const removeproductImagesFromCloud = async (productsPubicIds)=>{
+
+          const removePromisses = productsPubicIds.map((image_id)=>{
+
+              return fileRemoveFromCloud(image_id);
+              
+          })
+
+          await Promise.all(removePromisses);
+
+       }
+
+    await removeproductImagesFromCloud(productImages);
+
 
     if (user) {
       res.clearCookie("token");
@@ -217,50 +280,62 @@ export const userDelete = async (req, res, next) => {
       });
     }
   } catch (error) {
+
     next(error);
+
   }
+
 };
 
 export const userLogOut = (req, res) => {
+
   res.clearCookie("token");
 
   return res.status(200).json({
     success: true,
     message: "User logged out successfully",
   });
+
 };
 
 export const userProfileEdit = async (req, res) => {
+
   const userId = req.user._id;
   const { name, location } = req.body;
-
-  
 
   try {
 
     if (!name || !location) {
+
       throw new AppError("Please provide all the field", 400);
     }
+
     const user = await userModel.findById(userId);
 
     user.name = name;
     user.location = location;
 
     if (req.file) {
+
       if (user.avatar.userUploaded) {
-        fileRemoveFromCloud(user.avatar);
+
+         fileRemoveFromCloud(user.avatar.public_id);
+
       }
 
       try {
+
         const result = await fileUploadInCloudinary(req.file);
 
         if (result) {
+
           user.avatar.secure_url = result.secure_url;
           user.avatar.public_id = result.public_id;
+
         }
       } catch (error) {
         
-          next(error);
+          return next(error);
       }
     }
     await user.save();
@@ -270,15 +345,20 @@ export const userProfileEdit = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "profile updated successfully",
-      data : updatedUserDetails,
+      updatedUserDetails,
     });
+
   } catch (error) {
 
     next(error);
   
   } finally {
+
     if (req.file) {
+
       fileRemoveFromDisc(req.file);
+
     }
+
   }
 };

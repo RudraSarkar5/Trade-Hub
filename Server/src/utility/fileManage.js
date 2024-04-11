@@ -11,14 +11,14 @@ cloudinary.v2.config({
 
 
 // this function will file in cloudinary
-const fileUploadInCloudinary = async (localFilePath,userId) => {
+const fileUploadInCloudinary = async (localFilePath) => {
   
-  console.log(userId);
+  
   try {
     
     const response = await cloudinary.v2.uploader.upload(
       localFilePath.path,
-      {folder:userId,gravity:"center"}
+      {folder:"Trade-Hub"}
     );
 
     // console.log("response is ", response);
@@ -38,17 +38,17 @@ const fileRemoveFromDisc = async (localFile) => {
  
   try {
 
-    if (Array.isArray(localFile)) {
+    // if (Array.isArray(localFile)) {
       
-      for (const file of localFile) {
-        await fs.unlink(file.path); 
-      }
+    //   for (const file of localFile) {
+    //     await fs.unlink(file.path); 
+    //   }
 
-    } else {
+    // } else {
 
       await fs.unlink(localFile.path);
 
-    }
+    // }
 
   } catch (error) {
 
@@ -60,22 +60,22 @@ const fileRemoveFromDisc = async (localFile) => {
 };
 
 // this function will remove any file  from cloude
-const fileRemoveFromCloud = async (files) => {
+const fileRemoveFromCloud = async (imageId) => {
 
   try {
 
-    if (Array.isArray(files)) {
+    // if (Array.isArray(files)) {
 
-      for (const file of files) {
+    //   for (const file of files) {
 
-        await cloudinary.v2.uploader.destroy(file.public_id);
+    //     await cloudinary.v2.uploader.destroy(file.public_id);
 
-      }
-    } else {
+    //   }
+    // } else {
 
-      await cloudinary.v2.uploader.destroy(files.public_id);
+      await cloudinary.v2.uploader.destroy(imageId);
 
-    }
+    // }
 
   } catch (error) {
 

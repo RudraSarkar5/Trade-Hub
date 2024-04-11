@@ -33,7 +33,7 @@ productRoute
 // to update a particular product
 productRoute
   .route("/update-product/:productId")
-  .put(isLoggedIn, upload.array("images", 5), updateProduct);
+  .put(isLoggedIn, upload.array("images", 5), isLoggedIn, updateProduct);
 
 // to delete a product
 productRoute.route("/delete-product/:productId").delete(deleteProduct);
