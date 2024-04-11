@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { DB_NAME } from "../constants.js";
+import { envObject } from "./envConfig.js";
 
 // this function will connnect databases
 const dbconnection = async () => {
@@ -16,7 +17,7 @@ const dbconnection = async () => {
     })
 
     await mongoose.connect(
-      `${process.env.MONGO_DB_URL}/${DB_NAME}`
+      `${envObject.mongoDB}/${DB_NAME}`
     );
     
   } catch (error) {

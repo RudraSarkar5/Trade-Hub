@@ -1,13 +1,13 @@
 import app from "./src/app.js";
+import { envObject } from "./src/config/envConfig.js";
 // import {Server} from "socket.io";
 // import http from "http";
-import dotenv from "dotenv";
-dotenv.config();
 
-import dbconnection from "./src/db/dbConfig.js";
+
+import dbconnection from "./src/config/dbConfig.js";
 // import { makeUnRead } from "./controlers/chat.controler.js";
 
-const PORT = process.env.PORT || 5000;
+const PORT = envObject.port || 5000;
 
 // const server = http.createServer(app);
 

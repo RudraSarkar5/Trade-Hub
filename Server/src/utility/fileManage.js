@@ -1,13 +1,12 @@
 import cloudinary from "cloudinary";
 import {promises as fs} from "fs";
 import AppError from "./customError.js";
-import dotenv from "dotenv";
-dotenv.config();
+import { envObject } from "../config/envConfig.js";
 
 cloudinary.v2.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: envObject.CLOUDINARY_CLOUD_NAME,
+  api_key: envObject.CLOUDINARY_API_KEY,
+  api_secret: envObject.CLOUDINARY_API_SECRET,
 });
 
 

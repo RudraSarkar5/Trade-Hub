@@ -22,9 +22,9 @@ app.use(morgan("dev"));
 app.use(cookieParser());
 
 
-app.use("/api/user", userRoute);
-app.use("/api/product", productRoute);
-app.use("/api/chat", chatRoute);
+app.use("/api/users", userRoute);
+app.use("/api/products", productRoute);
+app.use("/api/chats", chatRoute);
 
 app.use(handleError);
 
