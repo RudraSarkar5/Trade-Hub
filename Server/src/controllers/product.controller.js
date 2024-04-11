@@ -228,11 +228,11 @@ export const updateProduct = async(req, res, next)=>{
        throw new AppError("please select atleast 3 images", 401);
 
       }
-
+      
       const productImages = product.images.map((imageObject) => {
         return imageObject.public_id;
       });
-
+      
       const removeproductImagesFromCloud = async (productsPubicIds) => {
         const removePromisses = productsPubicIds.map((image_id) => {
           return fileRemoveFromCloud(image_id);

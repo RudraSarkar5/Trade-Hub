@@ -146,10 +146,9 @@ export const makeRead = async (req, res) => {
     receiverId
   });
 };
+
 export const makeUnRead = async ({userId,friendId}) => {
-  
-  
-  
+
   const userFriend = await friendModel.findOne({
     userId,
     friendId
