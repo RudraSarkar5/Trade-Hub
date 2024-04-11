@@ -10,31 +10,25 @@ cloudinary.v2.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const ImageOption = {
-  folder: "Trade_Hub",
-  width: 250,
-  height: 250,
-  gravity: "center",
-};
 
 // this function will file in cloudinary
-const fileUploadInCloudinary = async (localFilePath) => {
+const fileUploadInCloudinary = async (localFilePath,userId) => {
   
-  console.log(localFilePath);
+  console.log(userId);
   try {
     
     const response = await cloudinary.v2.uploader.upload(
       localFilePath.path,
-      ImageOption
+      {folder:userId,gravity:"center"}
     );
-    console.log("response is ", response);
+
+    // console.log("response is ", response);
     
     return response;
 
   } catch (error) {
       
-      console.error(error.message);
-      throw new AppError(500,"image is not uploaded in cloud...");
+      throw new AppError("image is not uploaded in cloud...",500);
 
   }
      
@@ -59,7 +53,7 @@ const fileRemoveFromDisc = async (localFile) => {
 
   } catch (error) {
 
-    console.error("Error removing file(s):", error);
+    // console.error("Error removing file(s):", error);
     throw new AppError(500,"file not removing ...");
 
   }

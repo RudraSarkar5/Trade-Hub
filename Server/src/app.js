@@ -1,4 +1,4 @@
-import express from "express";
+import express, { urlencoded } from "express";
 import morgan from "morgan";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -17,6 +17,7 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(express.urlencoded({extended:true}));
 app.use(morgan("dev"));
 app.use(cookieParser());
 
@@ -25,6 +26,8 @@ app.use("/api/user", userRoute);
 app.use("/api/product", productRoute);
 app.use("/api/chat", chatRoute);
 
+app.use(handleError);
+
 app.use("*", (req, res) => {
   res.status(404).json({
     success: false,
@@ -32,6 +35,5 @@ app.use("*", (req, res) => {
   });
 });
 
-app.use(handleError);
 
 export default app;

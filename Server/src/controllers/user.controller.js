@@ -1,6 +1,7 @@
 import emailValidator from "email-validator";
 import { passwordHashed, comparePassword } from "../utility/password.js";
 import userModel from "../models/user.model.js";
+import productModel from "../models/product.model.js";
 import { generateJwtToken } from "../utility/jwtAuth.js";
 import AppError from "../utility/customError.js";
 import {
@@ -8,32 +9,25 @@ import {
   fileRemoveFromCloud,
   fileUploadInCloudinary,
 } from "../utility/fileManage.js";
+import { cookieOption } from "../constants.js";
+import cloudinary from "cloudinary";
 
-const cookieOption = {
-  maxAge: 24 * 60 * 60 * 1000, // 1 day
-  httpOnly: true,
-};
 
 export const userRegister = async (req, res, next) => {
   let user = null;
+  let result = null;
 
   const { name, email, password, location } = req.body;
-
+ 
   try {
     // this will check that all the field is filled or not
     if (!name || !email || !password || !location) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide all the field",
-      });
+       throw new AppError("Please provide all the field",400);
     }
 
     //   this will check the provided email is valid  or not
     if (!emailValidator.validate(email)) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide a valid email",
-      });
+      throw new AppError("Please provide a valid email", 400);
     }
 
     // check if already user exist or not
@@ -41,10 +35,7 @@ export const userRegister = async (req, res, next) => {
 
     // if user exist then simply send a response of user existance
     if (existingEmail) {
-      return res.status(400).json({
-        success: false,
-        message: "user already exist",
-      });
+      throw new AppError("user already exist", 400);
     }
 
     // making user inputed password hashed
@@ -54,33 +45,33 @@ export const userRegister = async (req, res, next) => {
 
     const avatarDocument = {
       userUploaded: false,
-      secure_url: "/avatar.png",
+      secure_url: "",
       public_id: "",
     };
 
+     user = await userModel.create({
+       name,
+       email,
+       password: hashedPasword,
+       location,
+       avatar: avatarDocument,
+     });
+
     // if user upload image then it will invoke
     if (req.file) {
-      const result = await fileUploadInCloudinary(req.file);
+       result = await fileUploadInCloudinary(req.file,user._id);
 
       if (result) {
-        avatarDocument.secure_url = result.secure_url;
-        avatarDocument.public_id = result.public_id;
-        avatarDocument.userUploaded = true;
+        user.avatar.secure_url = result.secure_url;
+        user.avatar.public_id = result.public_id;
+        user.avatar.userUploaded = true;
       } else {
-        throw new AppError(500, "image is not uploaded in cloud");
-        next();
+        throw new AppError("image is not uploaded in cloud", 500);
       }
     }
 
-    user = await userModel.create({
-      name,
-      email,
-      password: hashedPasword,
-      location,
-      avatar: avatarDocument,
-    });
-
     //  set password undefined before sending back user details to client side
+    await user.save();
     user.password = undefined;
 
     // here by giving user value one token will be generate
@@ -96,13 +87,17 @@ export const userRegister = async (req, res, next) => {
       value: user,
     });
   } catch (error) {
-    console.log(error.message);
+
+    if(result){
+      await fileRemoveFromCloud(result.public_id);
+    }
 
     if (user) {
       await userModel.deleteOne({ _id: user._id });
     }
 
-    next(new AppError(500, error.message));
+    next(error);
+
   } finally {
     // if user upload a file no matter error occures it will clear server disc storage
     if (req.file) {
@@ -111,25 +106,23 @@ export const userRegister = async (req, res, next) => {
   }
 };
 
-export const userLogin = async (req, res) => {
-  console.log("enter");
+export const userLogin = async (req, res, next) => {
+  
   const { email, password } = req.body;
 
   try {
     // this will check that all the field is filled or not
     if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide all the field",
-      });
+      
+      throw new AppError("Please provide all the field", 400);
+
     }
 
     //   this will check the provided email is valid  or not
     if (!emailValidator.validate(email)) {
-      return res.status(400).json({
-        success: false,
-        message: "Please provide a valid email",
-      });
+
+      throw new AppError("Please provide a valid email", 400);
+
     }
 
     // check if  user exist or not
@@ -137,17 +130,15 @@ export const userLogin = async (req, res) => {
 
     // if user not  exist then simply send a response of user not exist
     if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "user not exit",
-      });
+
+      throw new AppError("user not exit", 400);
+  
     }
     // if userInputed password does not match with existed password to the co reponding email then invalid password respond send
     if (!comparePassword(password, user.password)) {
-      return res.status(400).json({
-        success: false,
-        message: "incorrect password",
-      });
+
+      throw new AppError("incorrect password", 400);
+      
     }
 
     //  set password undefined before sending back user details to client side
@@ -160,20 +151,17 @@ export const userLogin = async (req, res) => {
     res.cookie("token", token, cookieOption);
 
     // if all  match successfully then user loggin successfully and send a success response
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "user login succesfully",
-      value: user,
+      data : user,
     });
   } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message: "internal server error",
-    });
+    next(error);
   }
 };
 
-export const getUserDetails = async (req, res) => {
+export const getUserDetails = async (req, res, next) => {
   const userId = req.user._id;
 
   try {
@@ -182,44 +170,44 @@ export const getUserDetails = async (req, res) => {
       return res.status(200).json({
         success: true,
         message: "fetched user data.",
-        value: user,
+        data : user,
       });
     }
   } catch (error) {
-    console.error(error.message);
-    return res.status(200).json({
-      success: false,
-      message: error.message,
-    });
+    
+    next(error);
+   
   }
 };
 
-export const getSellerDetails = async (req, res) => {
-  const { sellerId } = req.params;
+export const getSellerDetails = async (req, res, next) => {
+  const { id } = req.params;
 
   try {
-    const user = await userModel.findById(sellerId);
+    const user = await userModel.findById(id);
     if (user) {
       return res.status(200).json({
         success: true,
         message: "fetched user data.",
-        value: user,
+        data : user,
       });
+    }else {
+      throw new AppError("user not found",400);
     }
   } catch (error) {
-    console.error(error.message);
-    return res.status(200).json({
-      success: false,
-      message: error.message,
-    });
+    next(error);
   }
 };
 
-export const userDelete = async (req, res) => {
+export const userDelete = async (req, res, next) => {
   const userId = req.user._id;
-
+ 
   try {
+
+    const products = await productModel.deleteMany({userId});
+    await cloudinary.v2.api.delete_resources_by_prefix(`${userId}/`);
     const user = await userModel.findByIdAndDelete(userId);
+
     if (user) {
       res.clearCookie("token");
 
@@ -229,11 +217,7 @@ export const userDelete = async (req, res) => {
       });
     }
   } catch (error) {
-    console.error(error.message);
-    return res.status(200).json({
-      success: false,
-      message: error.message,
-    });
+    next(error);
   }
 };
 
@@ -250,14 +234,13 @@ export const userProfileEdit = async (req, res) => {
   const userId = req.user._id;
   const { name, location } = req.body;
 
-  if (!name || !location) {
-    return res.status(400).json({
-      success: false,
-      message: "Please provide all the field",
-    });
-  }
+  
 
   try {
+
+    if (!name || !location) {
+      throw new AppError("Please provide all the field", 400);
+    }
     const user = await userModel.findById(userId);
 
     user.name = name;
@@ -276,11 +259,8 @@ export const userProfileEdit = async (req, res) => {
           user.avatar.public_id = result.public_id;
         }
       } catch (error) {
-        console.log(error.message);
-        return res.status(500).json({
-          success: false,
-          message: error.message,
-        });
+        
+          next(error);
       }
     }
     await user.save();
@@ -290,14 +270,12 @@ export const userProfileEdit = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "profile updated successfully",
-      value: updatedUserDetails,
+      data : updatedUserDetails,
     });
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+
+    next(error);
+  
   } finally {
     if (req.file) {
       fileRemoveFromDisc(req.file);

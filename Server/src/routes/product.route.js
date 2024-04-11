@@ -9,7 +9,6 @@ import {
 } from "../controllers/product.controller.js";
 
 import {
-  handleMulterError,
   upload,
 } from "../middlewares/multer.middleware.js";
 
@@ -29,12 +28,12 @@ productRoute.route("/user-products").get(isLoggedIn, getUserProducts);
 // to add a product
 productRoute
   .route("/add-product")
-  .post(isLoggedIn, upload.array("images", 5), handleMulterError, addProduct);
+  .post(isLoggedIn, upload.array("images", 5), addProduct);
 
 // to update a particular product
 productRoute
   .route("/update-product/:productId")
-  .put(isLoggedIn, upload.array("images", 5), handleMulterError, updateProduct);
+  .put(isLoggedIn, upload.array("images", 5), updateProduct);
 
 // to delete a product
 productRoute.route("/delete-product/:productId").delete(deleteProduct);

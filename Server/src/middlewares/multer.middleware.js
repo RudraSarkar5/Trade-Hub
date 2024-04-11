@@ -1,11 +1,20 @@
 import multer from "multer";
-import path from "path";
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
+
+
+// Get the directory path of the current module file
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Define the destination directory as a relative path
+const destinationDirectory = path.join(__dirname, "../../public/upload");
+
 
 
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "upload");
+    cb(null, destinationDirectory);
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
@@ -34,7 +43,7 @@ const fileFilter = function (req, file, cb) {
 
   } else {
    
-    cb(new Error("File format is not supported"));
+    cb(new Error("File format is not supported",400));
   }
 };
 
@@ -48,14 +57,6 @@ const upload = multer ({
    }
 })
 
-// this function will invoke if any error pass from multer  
-const handleMulterError =(err,req,res,next)=>{
-   
-        return res.status(400).json({
-          success: false,
-          message: err.message,
-      
-        })
-}
 
-export {upload,handleMulterError};
+
+export {upload};
