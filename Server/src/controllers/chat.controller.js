@@ -1,8 +1,12 @@
-import { chatModel } from "../models/chat.model.js";
+import  chatModel  from "../models/message.model.js";
 import friendModel from "../models/friend.model.js";
 import UserModel from "../models/user.model.js";
+import AppError from "../utility/customError.js";
 
-export const getFriends = async (req, res) => {
+
+
+export const getFriends = async (req, res, next) => {
+
   const userId = req.user._id;
   
   try {
@@ -33,30 +37,30 @@ export const getFriends = async (req, res) => {
 };
 
 export const getMessage = async (req, res) => {
+
   const { senderId, receiverId } = req.query;
-  if(receiverId == null){
-    return res.status(200).json({
-      success:false,
-      message : "invalid request"
-    })
-  }
+
   try {
-    const conversation = await chatModel.findOne({
+
+    if (receiverId == null || senderId == null) {
+      throw new AppError("invalid request", 400);
+    }
+
+    const conversation = await chatModel.find({
       participant: { $all: [senderId, receiverId] },
-    });
+    }).sort({timestamp : -1});
+
     if (conversation) {
       return res.status(200).json({
         success: true,
         messages: conversation.messages,
       });
-    } else {
-      return res.status(200).json({
-        success: true,
-        messages: [],
-      });
-    }
+    } 
+
   } catch (error) {
-    console.log(error.message);
+
+    next(error);
+
   }
   
 };
@@ -65,32 +69,38 @@ export const addMessage = async (req, res) => {
   // fetch the body of the request
   const { senderId, receiverId, message } = req.body;
   
-  // check if the sender and receiver already exist or not
-  const friendShipExist = await friendModel.findOne({
-    userId: receiverId,
-    friendId: senderId,
-  });
   
+  const friendExistForUser = await friendModel.findOne({
+    userId: senderId,
+    friendId: receiverId,
+  });
 
-  if (friendShipExist) {
-    friendShipExist.lastMessage = message;
+  if (friendExistForUser) {
 
-    await friendShipExist.save();
+    friendExistForUser.lastMessage = message;
+    await friendExistForUser.save();
 
-    const forUser = await friendModel.findOne({
-      userId: senderId,
-      friendId: receiverId,
-    });
-
-    forUser.lastMessage = message;
-    await forUser.save();
-    
   } else {
+
     const forUser = await friendModel.create({
       userId: senderId,
       friendId: receiverId,
       lastMessage: message,
     });
+
+  }
+
+  const friendShipExistForFriend = await friendModel.findOne({
+      userId: receiverId,
+      friendId: senderId,
+    });
+
+  if (friendShipExistForFriend) {
+
+    friendShipExistForFriend.lastMessage = message;
+    await friendExistForUser.save();
+
+  } else {
 
     const forFriend = await friendModel.create({
       userId: receiverId,
@@ -98,30 +108,14 @@ export const addMessage = async (req, res) => {
       lastMessage: message,
     });
 
-    await forUser.save();
-    await forFriend.save();
   }
 
-  const messageDocument = {
+  const messgaeRecord = await chatModel.create({
+    participants : [senderId,receiverId],
     senderId,
     content: message,
-  };
-
-  let conversation = await chatModel.findOne({
-    participant: { $all: [senderId, receiverId] },
   });
 
-  if (conversation) {
-    // Conversation exists, add message to existing conversation
-    conversation.messages.push(messageDocument);
-    await conversation.save();
-  } else {
-    // Conversation does not exist, create a new conversation
-    conversation = await chatModel.create({
-      participant: [senderId, receiverId],
-      messages: [messageDocument],
-    });
-  }
   return res.status(200).json({
     success : true,
     messagess : "succesfully insertend"
@@ -129,6 +123,7 @@ export const addMessage = async (req, res) => {
 };
 
 export const makeRead = async (req, res) => {
+
   const { receiverId, senderId } = req.body;
   
   const userFriend = await friendModel.findOne({
