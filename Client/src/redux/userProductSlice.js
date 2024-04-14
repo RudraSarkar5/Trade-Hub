@@ -3,7 +3,7 @@ import axios from "../helper/axiosInstance";
 import toast from "react-hot-toast";
 
 const initialState = {
-    needProductReLoad : true,
+    productUpToDate : false,
     productNumber : 0,
     products : []
 }
@@ -13,7 +13,7 @@ export const addProduct = createAsyncThunk(
   "products/addProduct",
   async function (data) {
     try {
-      let response =  axios.post("/product/add-product", data);
+      let response =  axios.post("/products/add-product", data);
       toast.promise(response,{
         loading : "creating product...",
         success : "product created!",
@@ -34,7 +34,7 @@ export const updateProduct = createAsyncThunk(
     
     try {
       let response = axios.put(
-        `/product/update-product/${_id}`,
+        `/products/update-product/${_id}`,
         productFormData
       );
       toast.promise(response, {
@@ -53,10 +53,11 @@ export const updateProduct = createAsyncThunk(
 // this will fetch all user product
  export const getUserProducts = createAsyncThunk("product/userProducts",async function(){
         try {
-          let response = await axios.get("/product/user-products");
+          let response = await axios.get("/products/user-products");
           return response.data;
         } catch (error) {
             console.log(error.message);
+            throw error;
           }
  });  
 
@@ -65,7 +66,7 @@ export const updateProduct = createAsyncThunk(
    async function (productId) {
     
      try {
-       let response = axios.delete(`/product/delete-product/${productId}`);
+       let response = axios.delete(`/products/delete-product/${productId}`);
        
        toast.promise(response, {
          loading: "deleting product...",
@@ -90,26 +91,27 @@ const userProductSlice = createSlice({
     extraReducers:(builder)=>{
         builder
           .addCase(addProduct.fulfilled,(state,action)=>{
-             state.needProductReLoad = true;
-             console.log("fullfilled state");
+             state.productUpToDate = true;
+             state.productNumber = state.productNumber+1;
+             state.products.push(action.payload.product);
           })
 
           .addCase(getUserProducts.fulfilled, (state, action) => {
-            state.needProductReLoad = false;
-            state.productNumber = action?.payload?.value?.length;
-            state.products = action?.payload?.value;
+            state.productUpToDate = true;
+            state.productNumber = action?.payload?.products?.length;
+            state.products = action?.payload?.products;
           })
 
-          .addCase(getUserProducts.rejected, (state, action) => {
-            state.needProductReLoad = false;
-            state.products = [];
-            state.productNumber = 0;
-          })
+          // .addCase(getUserProducts.rejected, (state, action) => {
+          //   state.needProductReLoad = false;
+          //   state.products = [];
+          //   state.productNumber = 0;
+          // })
           .addCase(deleteProduct.fulfilled, (state, action) => {
-            state.needProductReLoad = true;
+            state.productUpToDate = true;
           })
           .addCase(updateProduct.fulfilled, (state, action) => {
-            state.needProductReLoad = true;
+            state.productUpToDate = false;
           });
     }
 

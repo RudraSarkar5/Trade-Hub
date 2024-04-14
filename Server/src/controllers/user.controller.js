@@ -77,12 +77,15 @@ export const userRegister = async (req, res, next) => {
     //  set password undefined before sending back user details to client side
     await user.save();
     user.password = undefined;
+    
 
     // here by giving user value one token will be generate
     const token = await generateJwtToken(JSON.parse(JSON.stringify(user)));
 
     // then save token as cookie
     res.cookie("token", token, cookieOption);
+
+
 
     //  if all the check is completly passed and user if created successfully then send success response
     res.status(201).json({
@@ -182,6 +185,8 @@ export const getUserDetails = async (req, res, next) => {
   try {
 
     const user = await userModel.findById(userId);
+
+    user.password = undefined;
 
     if (user) {
 
@@ -345,7 +350,7 @@ export const userProfileEdit = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "profile updated successfully",
-      updatedUserDetails,
+      user : updatedUserDetails,
     });
 
   } catch (error) {

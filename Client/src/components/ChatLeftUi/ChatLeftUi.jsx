@@ -3,40 +3,28 @@ import { IoMdArrowBack } from "react-icons/io";
 import axios from "../../helper/axiosInstance";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 
-
 import { useContext } from "react";
-import { chatContext } from "../../contexApi/chatContext";
+import { chatContext } from "../../contexApi/ContextProvider";
 
 const ChatLeftUi = ({ chatShow, show }) => {
-
-  
   const navigate = useNavigate();
 
   const { friends, setSelectedFriend } = useContext(chatContext);
 
-  
-  
   // this will track chat state
-  
-  
+
   // this state will contain all friends
   const [friendList, setFriendList] = useState([]);
- 
-  // this state will keep track the active friend chat 
+
+  // this state will keep track the active friend chat
   const [friendActiveId, setFriendActiveId] = useState(null);
-  
 
-  
-
-  
   // this will fetch userDetails from localStorage
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
 
-  
   const handleClickOnFriend = (friend) => {
-    
     navigate("/chat");
-    
+
     setSelectedFriend(friend);
     if (friendActiveId == friend._id) {
       chatShow();
@@ -46,13 +34,9 @@ const ChatLeftUi = ({ chatShow, show }) => {
     setFriendActiveId(friend._id);
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     setFriendList(friends);
-  },[friends])
-
-  
-    
- 
+  }, [friends]);
 
   const leftBarClassName = show
     ? "h-[100%]   md:flex flex-col bg-gray-700  hidden md:w-1/3"

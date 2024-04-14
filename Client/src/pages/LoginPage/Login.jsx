@@ -44,7 +44,6 @@ const Login = () => {
     const action = await dispatch(login(loginData));
     
     if (action?.payload?.success) {
-     
       navigate("/");
     }
   };

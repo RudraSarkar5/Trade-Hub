@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { addProduct } from "../../redux/userProductSlice";
 
 const AddProduct = ({ controlShowProduct }) => {
+  
   const [productData, setProductData] = useState({});
   const isDone = useSelector((state) => state.userProducts.userProductState);
   const dispatch = useDispatch();

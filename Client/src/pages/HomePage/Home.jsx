@@ -4,10 +4,10 @@ import Search from "../../components/Search/Search.jsx";
 import Layout from "../../Layout/Layout.jsx";
 import { fetchProducts,searchedProductName } from "../../redux/productSlice.js";
 import { useDispatch, useSelector } from "react-redux";
-
 import "./Home.css";
 
 const Home = () => {
+
   const dispatch = useDispatch();
 
   const [showproducts, setShowproducts] = useState([]);

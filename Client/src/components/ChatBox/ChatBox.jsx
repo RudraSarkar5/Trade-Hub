@@ -9,12 +9,11 @@ import Layout from "../../Layout/Layout";
 import axios from "../../helper/axiosInstance";
 
 import { useContext } from "react";
-import { chatContext } from "../../contexApi/chatContext";
-
+import { chatContext } from "../../contexApi/ContextProvider";
 
 const ChatBox = ({ friend = null, chatShow }) => {
-  
-  const { selectedFriend, socket, friends,notification,setNotification} = useContext(chatContext);
+  const { selectedFriend, socket, friends, notification, setNotification } =
+    useContext(chatContext);
 
   const [allMsg, setAllMsg] = useState([]);
 
@@ -26,11 +25,9 @@ const ChatBox = ({ friend = null, chatShow }) => {
   const myId = userDetails._id;
 
   const currentFriend = selectedFriend;
-  
 
   // find the receiver Id
   let currentFriendId = currentFriend ? currentFriend._id : null;
-  
 
   // this function will send message
   const msgSend = async () => {
@@ -51,25 +48,20 @@ const ChatBox = ({ friend = null, chatShow }) => {
   };
 
   useEffect(() => {
-
-    socket.emit("setConnection",{myId,friendId:currentFriendId});
+    socket.emit("setConnection", { myId, friendId: currentFriendId });
 
     const fetchData = async () => {
-      const {data} = await axios.post("/chat/make-read", {
+      const { data } = await axios.post("/chat/make-read", {
         senderId: myId,
         receiverId: currentFriendId,
       });
-      
 
       friends.find((friend) => {
-
         if (friend.friendId._id == data.receiverId) {
-
-          if(friend.unRead == true){
+          if (friend.unRead == true) {
             friend.unRead = false;
             setNotification(notification - 1);
           }
-          
         }
       });
 
@@ -106,7 +98,6 @@ const ChatBox = ({ friend = null, chatShow }) => {
     };
   }, [socket, myId, currentFriendId]);
 
-
   useEffect(() => {
     // Listen for incoming messages
     socket.on("message", ({ senderId, receiverId, message }) => {
@@ -114,13 +105,10 @@ const ChatBox = ({ friend = null, chatShow }) => {
         senderId,
         content: message,
       };
-      
 
-      if(senderId == myId || senderId == currentFriendId){
-        
+      if (senderId == myId || senderId == currentFriendId) {
         setAllMsg((prev) => [...prev, msgObj]);
       }
-
     });
   }, [socket]);
 

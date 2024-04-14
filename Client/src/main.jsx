@@ -5,14 +5,14 @@ import "./index.css";
 import { BrowserRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./redux/store.js";
-import ContextProvider from "./contexApi/chatContext.jsx";
+import ContextProvider from "./contexApi/ContextProvider.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
-    <ContextProvider>
-      <Provider store={store}>
+    <Provider store={store}>
+      <ContextProvider>
         <App />
-      </Provider>
-    </ContextProvider>
+      </ContextProvider>
+    </Provider>
   </BrowserRouter>
 );

@@ -1,25 +1,19 @@
 import LogoImage from "../../assets/favicon.png";
-import { NavLink ,Link } from "react-router-dom";
-import {useDispatch,useSelector} from "react-redux"
+import { NavLink, Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { useContext, useEffect } from "react";
 
-
-import { chatContext } from "../../contexApi/chatContext";
+// import { chatContext } from "../../contexApi/ContextProvider";
 
 const Navbar = () => {
-  const {  notification } = useContext(chatContext);
-  
 
-  const isLoggedIn = useSelector((state)=>state.user.isLoggedIn);
+  // const { notification } = useContext(chatContext);
 
-  const userDetails = JSON.parse(localStorage.getItem("userDetails"));
-  const myId = userDetails?userDetails._id:null;
- 
-  
-  
-
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 
   
+  // const myId = userDetails ? userDetails._id : null;
+
   return (
     <div className="w-screen fixed top-0 z-10  px-1 bg-[#1f5376] py-2 h-fit flex items-center justify-between">
       <Link to="/">
@@ -47,7 +41,12 @@ const Navbar = () => {
         </NavLink>
         {isLoggedIn && (
           <NavLink to="/chat">
-            <li className="flex gap-1">chat {notification?(<h1 className="text-yellow-500">({notification})</h1>):null} </li>
+            <li className="flex gap-1">
+              chat
+              {/* {notification ? (
+                <h1 className="text-yellow-500">({notification})</h1>
+              ) : null}{" "} */}
+            </li>
           </NavLink>
         )}
       </ul>

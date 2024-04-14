@@ -29,7 +29,7 @@ const Signup = () => {
   };
 
   const handleSubmit = async (e) => {
-    console.log("all good");
+    
     e.preventDefault();
 
     // this will check that all field should filled
@@ -66,6 +66,7 @@ const Signup = () => {
 
     // Dispatch the fetchUsers thunk action and hold the promise
     const action = await dispatch(createAccount(signFormData));
+
     if(action.payload.success){
       navigate("/")
     } 

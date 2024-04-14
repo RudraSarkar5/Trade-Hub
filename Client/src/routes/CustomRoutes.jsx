@@ -19,7 +19,7 @@ const CustomRoutes = () => {
       <Route path="/chat-box/:id" element={<ChatBox />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      <Route path="/product-info" element={<ProductInfo />} />
+      <Route path="/product-info/:productId" element={<ProductInfo />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/profile-update" element={<EditProfile />} />
       <Route path="/product-update" element={<EditProduct />} />

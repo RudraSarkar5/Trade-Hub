@@ -11,10 +11,21 @@ export const fetchProducts = createAsyncThunk(
   "products/getAllProducts",
   async function ({ page, limit,numberOfButtonPage, starting }) {
     let response = await axios.get(
-      `/product/all-products?page=${page}&limit=${limit}&numberOfButtonPage=${numberOfButtonPage}&starting=${starting}`
+      `/products/all-products?page=${page}&limit=${limit}&numberOfButtonPage=${numberOfButtonPage}&starting=${starting}`
     );
 
     return response.data;
+  }
+);
+
+export const fetchProductDetails = createAsyncThunk(
+  "products/productDetails", async function ({ productId }) {
+    try {
+      let response = await axios.get(`/products/product-details/${productId}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 );
 

@@ -9,13 +9,14 @@ import AddProduct from "../../components/AddProduct/AddProduct";
 import { Link, useNavigate } from "react-router-dom";
 
 const Profile = () => {
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showProducts, setShowProducts] = useState(true);
   
   
 
-  const handleProductList = () => {
+  const handleShowProduct = () => {
     setShowProducts(true);
   };
 
@@ -23,16 +24,15 @@ const Profile = () => {
     setShowProducts(false);
   };
 
-  const handleShowProduct = () => {
-    setShowProducts(true);
-  };
+  // const handleShowProducts = () => {
+  //   setShowProducts(true);
+  // };
 
   const handleLogOut = async () => {
     const action = await dispatch(logOut());
     if (action.payload?.success) {
       navigate("/login");
       window.location.reload();
-      
     }
   };
 
@@ -45,25 +45,18 @@ const Profile = () => {
   };
 
   const { data , isUpToDate } = useSelector((state) => state?.user);
-  const { products, needProductReLoad } = useSelector(
-    (state) => state?.userProducts
+  const { products, productUpToDate } = useSelector((state) => state?.userProducts
   );
 
   useEffect(() => {
-    if (!isUpToDate) {
-      dispatch(getUserDetails()).then((action) => {
-        if (!action.payload?.success) {
-          handleLogOut();
-        }
-      });
-    }
-    if (needProductReLoad) {
+    if (!productUpToDate) {
       dispatch(getUserProducts());
-    }
-  }, [isUpToDate, needProductReLoad]);
+    };
+  }, [productUpToDate]);
 
   return (
     <Layout>
+
       <div className="">
         {data && (
           <UserDetails
@@ -77,7 +70,7 @@ const Profile = () => {
       <ul className="py-2 flex justify-center items-center gap-5">
         <li
           className="bg-white text-black rounded-md px-2 py-1"
-          onClick={handleProductList}
+          onClick={handleShowProduct}
         >
           Product List
         </li>

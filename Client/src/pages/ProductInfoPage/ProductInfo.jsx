@@ -1,42 +1,46 @@
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
 import Layout from "../../Layout/Layout";
 import { useEffect, useId, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "../../helper/axiosInstance";
-import { chatContext } from "../../contexApi/chatContext";
+import { chatContext } from "../../contexApi/ContextProvider";
 import { useContext } from "react";
+import { useDispatch } from "react-redux";
+import { fetchProductDetails } from "../../redux/productSlice";
 
 const ProductInfo = () => {
   const navigate = useNavigate();
-  
-  const { state } = useLocation();
-   const { selectedFriend, setSelectedFriend } = useContext(chatContext);
+  const dispatch = useDispatch();
+  const [ product , setProduct ] = useState({});
+
+  const { productId } = useParams;
+  const { selectedFriend, setSelectedFriend } = useContext(chatContext);
 
   const { price, description, images, productName, userId } = state;
 
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
   const id = userDetails._id;
-  
-  const [bigImage, setBigImage] = useState(images[0].secure_url);
+
+  const [bigImage, setBigImage] = useState("");
   const [proudctImages, setProductImages] = useState([]);
 
-  
+  const connectWithSeller = () => {
+    navigate("/chat", { state: { onlyChatBox: true } });
+  };
 
-  const connectWithSeller =()=>{
-     navigate("/chat", { state: { onlyChatBox: true } });
-  }
+  useEffect(() => {
+      axios.get(`/products/product-details/${productId}`)
+      .then(({data})=>{console.log(data)})
+      .catch((err)=>{console.log(err)});
+  }, [productId]);
 
-
-  
-
-  useEffect(()=>{
-    async function fetchSeller(){
+  useEffect(() => {
+    async function fetchSeller() {
       const response = await axios.get(`/user/seller-details/${userId}`);
       setSelectedFriend(response.data.value);
     }
     fetchSeller();
-    
-  },[])
+  }, []);
 
   return (
     <Layout>
@@ -66,11 +70,12 @@ const ProductInfo = () => {
             <h1 className="text-3xl font-bold">{productName}</h1>
             {userId != id && (
               <div className="flex justify-center relative mt-5 items-center">
-                
-                  <button onClick={connectWithSeller} className=" w-fit p-3 bg-sky-500 text-white shadow-lg rounded-lg ">
-                    Connect With Seller
-                  </button>
-                
+                <button
+                  onClick={connectWithSeller}
+                  className=" w-fit p-3 bg-sky-500 text-white shadow-lg rounded-lg "
+                >
+                  Connect With Seller
+                </button>
               </div>
             )}
           </div>

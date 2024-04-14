@@ -3,6 +3,7 @@ import {
   addProduct,
   deleteProduct,
   getAllProducts,
+  getProductDetails,
   getUserProducts,
   searchProducts,
   updateProduct,
@@ -18,6 +19,9 @@ const productRoute = Router();
 
 // to get all products in home page
 productRoute.route("/all-products").get(getAllProducts);
+
+// to get all products in home page
+productRoute.route("/product-details/:productId").get(getProductDetails);
 
 // to search products
 productRoute.route("/search-products/:searchedProductName").get(searchProducts);

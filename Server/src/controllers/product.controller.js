@@ -79,6 +79,28 @@ export const getUserProducts = async (req, res, next) => {
   }
 };
 
+export const getProductDetails = async (req, res, next) => {
+  
+  const { productId } = req.params;
+
+  try {
+
+    const product = await productModel.findById(productId);
+   
+    
+      return res.status(200).json({
+        success: true,
+        message: "Product fetched successfully",
+        product,
+      });
+
+  } catch (error) {
+   
+    next(error);
+  
+  }
+};
+
 export const addProduct = async(req, res, next)=>{
 
     const id = req.user._id;
@@ -154,7 +176,7 @@ export const addProduct = async(req, res, next)=>{
     return res.status(200).json({
       success: true,
       message: "product added successfully",
-      product
+      product,
     });
 
   }

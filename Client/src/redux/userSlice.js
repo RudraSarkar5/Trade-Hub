@@ -5,11 +5,9 @@ import toast from "react-hot-toast";
 
 const initialState = {
   isUpToDate : false,
-  isLoggedIn: JSON.parse(localStorage.getItem("isLoggedIn")) || false,
-  data: JSON.parse(localStorage.getItem("userDetails")) || {},
+  isLoggedIn:  false,
+  data :  {},
 };
-
-
 
 
 // api call for user creation using createAsyncThunk
@@ -17,7 +15,7 @@ export const createAccount = createAsyncThunk(
   "action/register",
   async function (data) {
     try {
-      let response =  axios.post("/user/register", data);
+      let response =  axios.post("/users/register", data);
       toast.promise(response,{
          loading : "creating account...",
          success : "created account successfully...",
@@ -37,7 +35,7 @@ export const editProfile = createAsyncThunk(
   "action/editProfile",
   async function (data) {
     try {
-      let response =  axios.put("/user/profile-update", data);
+      let response =  axios.put("/users/profile-update", data);
       toast.promise(response, {
         loading: "updating profile ...",
         success: (response) => {
@@ -60,7 +58,7 @@ export const login = createAsyncThunk(
   "action/login",
   async function (data) {
     try {
-      let response =  axios.post("/user/login", data);
+      let response =  axios.post("/users/login", data);
       toast.promise(response, {
        loading : "processing...",
        success : "login successfully...",
@@ -78,7 +76,7 @@ export const logOut = createAsyncThunk(
   "action/logOut",
   async function () {
     try {
-      let response =  axios.get("/user/logout");
+      let response =  axios.get("/users/logout");
       toast.promise(response, {
         loading: "processing ...",
         success: "log out successfully...",
@@ -94,10 +92,10 @@ export const logOut = createAsyncThunk(
 
 // api call for delete accout using createAsyncThunk
 export const userDelete = createAsyncThunk(
-  "/action/userDelete",
+  "action/userDelete",
   async function () {
     try {
-      let response =  axios.delete("/user/delete");
+      let response =  axios.delete("/users/delete");
       toast.promise(response, {
         loading: "processing ...",
         success: "account deleted successfully",
@@ -117,16 +115,11 @@ export const getUserDetails = createAsyncThunk(
   "action/userDetails",
   async function () {
     try {
-      let response = axios.get("/user/user-details");
-      toast.promise(response, {
-        loading: "fetching profile data...",
-        success : "fetched profile successfully",
-        error: ((error)=> error?.response?.data?.message)
-      })  
-      response = await response;
+      let response = await axios.get("/users/user-details"); 
       return response.data;
     } catch (error) {
-        throw error;
+        console.log(error);
+        throw  error;
     }
   }
 );
@@ -140,41 +133,37 @@ const userSlice = createSlice({
   extraReducers:(builder)=>{
       builder
       .addCase(createAccount.fulfilled,(state,action)=>{
-        localStorage.setItem("isLoggedIn",true);
-        localStorage.setItem("userDetails",JSON.stringify(action?.payload?.value));
         state.isUpToDate = true;
-        state.data = action?.payload?.value;
         state.isLoggedIn = true;
+        state.data = action?.payload?.user;
       })
+
       .addCase(login.fulfilled,(state,action)=>{
-       localStorage.setItem("isLoggedIn", true);
-       localStorage.setItem("userDetails",JSON.stringify(action?.payload?.value));
        state.isUpToDate = true;
-       state.data = action?.payload?.value;
        state.isLoggedIn = true;
+       state.data = action?.payload?.user;
       })
+
       .addCase(logOut.fulfilled,(state,action)=>{
-        localStorage.clear();
         state.isLoggedIn = false;
         state.data = {};
         state.isUpToDate = false;
       })
+
       .addCase(userDelete.fulfilled,(state,action)=>{
-        localStorage.clear();
         state.isLoggedIn = false;
         state.data = {};
         state.isUpToDate = false;
       })
+
       .addCase(getUserDetails.fulfilled,(state,action)=>{
-        localStorage.setItem("isLoggedIn", true);
-        localStorage.setItem("userDetails",JSON.stringify(action?.payload?.value));
         state.isLoggedIn = true;
-        state.data = action.payload.value;
+        state.data = action.payload.user;
         state.isUpToDate = true;
       })
+
       .addCase(editProfile.fulfilled,(state,action)=>{
-        localStorage.setItem("isLoggedIn", true);
-        localStorage.setItem("userDetails",JSON.stringify(action?.payload?.value));
+        state.data = action.payload.user;
         state.isUpToDate=false;
       })
       

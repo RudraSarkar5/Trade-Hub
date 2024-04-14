@@ -17,43 +17,46 @@ const Card = ({ user = false, value }) => {
     }
   };
   return (
-    <div className="h-[400px] p-1  md:w-[30%]  grid grid-rows-12 bg-[#5387a6] shadow-lg rounded-lg">
-      <div className=" row-span-1 bg-[#2c4d5f]">
-        <h1 className="text-xl text-center uppercase">{value.productName}</h1>
-      </div>
-      <div className=" mx-auto row-span-9 bg-[#5387a6] ">
-        <img
-          src={value&&value.images[0]?.secure_url}
-          alt="product-image"
-          className=" h-[100%] w-[100%]"
-        />
-      </div>
-      <div className={cardClassName}>
-        <p>Price : {value.price}</p>
-        <NavLink to="/product-info" state={value}>
-          
-          <button className="px-4 py-1 bg-blue-500 text-black hover:bg-green-500 rounded-lg ">
-            Info
-          </button>
-        </NavLink>
-      </div>
-      {user && (
-        <div className="  row-span-1 flex justify-around items-center bg-[#29495b]">
-          <NavLink to="/product-update" state={value}>
-            <button className="px-2 py-1 bg-blue-500 text-black hover:bg-green-500 rounded-lg ">
-              Edit
-            </button>
-          </NavLink>
-
-          <button
-            onClick={() => handleDelete(value._id)}
-            className="px-2 py-1 bg-red-500 text-black hover:bg-green-500 rounded-lg "
-          >
-            Delete
-          </button>
+    <NavLink
+      to={`/product-info/${value._id}`}
+      className="gap-5 flex-wrap mb-12 flex-col md:flex-row flex justify-center p-5 w-full min-h-fit"
+    >
+      <div className="h-[400px] p-1  md:w-[30%]  grid grid-rows-12 bg-[#5387a6] shadow-lg rounded-lg">
+        <div className=" row-span-1 bg-[#2c4d5f]">
+          <h1 className="text-xl text-center uppercase">{value.productName}</h1>
         </div>
-      )}
-    </div>
+        <div className=" mx-auto row-span-9 bg-[#5387a6] ">
+          <img
+            src={value && value.images[0]?.secure_url}
+            alt="product-image"
+            className=" h-[100%] w-[100%]"
+          />
+        </div>
+        <div className={cardClassName}>
+          <p>Price : {value.price}</p>
+
+          {/* <button className="px-4 py-1 bg-blue-500 text-black hover:bg-green-500 rounded-lg ">
+            Info
+          </button> */}
+        </div>
+        {user && (
+          <div className="  row-span-1 flex justify-around items-center bg-[#29495b]">
+            <NavLink to="/product-update" state={value}>
+              <button className="px-2 py-1 bg-blue-500 text-black hover:bg-green-500 rounded-lg ">
+                Edit
+              </button>
+            </NavLink>
+
+            <button
+              onClick={() => handleDelete(value._id)}
+              className="px-2 py-1 bg-red-500 text-black hover:bg-green-500 rounded-lg "
+            >
+              Delete
+            </button>
+          </div>
+        )}
+      </div>
+    </NavLink>
   );
 };
 
