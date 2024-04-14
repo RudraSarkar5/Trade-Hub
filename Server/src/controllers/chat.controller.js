@@ -19,7 +19,11 @@ export const makeFriend = async (req, res, next) => {
       
       if ( friendShipExist){
 
-          throw new AppError("chat Already exist!",400);
+          return res.status(200).json({
+            success : true,
+            message : "successfully fetched chat data",
+            data : friendShipExist,
+          })
 
       }
 
@@ -140,7 +144,7 @@ export const getChatList = async (req, res, next) => {
       },
     ]);
 
-    console.log("the last message is this",chats[0].lastMessage);
+    
 
     return res.status(200).json({
       success: true,
@@ -157,8 +161,7 @@ export const getChatList = async (req, res, next) => {
   }
 };
 
-
-export const getMessage = async (req, res) => {
+export const getMessage = async (req, res, next) => {
 
   const { senderId, receiverId } = req.query;
 
@@ -187,30 +190,40 @@ export const getMessage = async (req, res) => {
   
 };
 
-export const addMessage = async (req, res) => {
-  // fetch the body of the request
-  const { senderId, receiverId, message } = req.body;
+export const addMessage = async (req, res, next) => {
   
-  
-  const friendExistForUser = await friendModel.findOne({
-    userId: senderId,
-    friendId: receiverId,
-  });
+  const {  content } = req.body;
+  const { chatId } = req.params;
+  const senderId = req.user._id;
+ 
+  try {
+    
+    if (!content || !chatId) {
+      throw new AppError("please fill all the field ", 400);
+    }
 
-  if (friendExistForUser) {
-
-    friendExistForUser.lastMessage = message;
-    await friendExistForUser.save();
-
-  } else {
-
-    const forUser = await friendModel.create({
-      userId: senderId,
-      friendId: receiverId,
-      lastMessage: message,
+    const messageInstance = await messageModel.create({
+      senderId,
+      chatId,
+      content,
     });
+    console.log(messageInstance);
 
+    const updatedChatInstance = await chatModel.findByIdAndUpdate(chatId , {$set:{lastMessage:messageInstance._id}},{new : true});
+
+    console.log(updatedChatInstance);
+
+    return res.status(200).json({
+      success : true,
+      message : "message successfully saved",
+    })
+
+  } catch (error) {
+    next(error);
   }
+    
+
+
 
   const friendShipExistForFriend = await friendModel.findOne({
       userId: receiverId,
