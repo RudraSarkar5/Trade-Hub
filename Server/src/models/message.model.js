@@ -2,18 +2,16 @@ import mongoose from "mongoose";
 
 const messageSchema = new mongoose.Schema(
   {
-    participants: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "user",
-      },
-    ],
     senderId: {
       type: mongoose.Types.ObjectId,
       ref: "user",
     },
     content: {
       type: String,
+    },
+    chatId: {
+      type: mongoose.Types.ObjectId,
+      ref: "chat",
     },
   },
   {
@@ -22,5 +20,5 @@ const messageSchema = new mongoose.Schema(
 );
 
 
-const chatModel = mongoose.model("message", chatSchema);
-export default chatModel;
+const messageModel = mongoose.model("message", messageSchema);
+export default messageModel;

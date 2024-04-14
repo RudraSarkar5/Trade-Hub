@@ -1,40 +1,162 @@
-import  chatModel  from "../models/message.model.js";
-import friendModel from "../models/friend.model.js";
+import messageModel from "../models/message.model.js";
+import chatModel from "../models/chat.model.js";
 import UserModel from "../models/user.model.js";
 import AppError from "../utility/customError.js";
+import mongoose from "mongoose";
 
 
+export const makeFriend = async (req, res, next) => {
 
-export const getFriends = async (req, res, next) => {
+    const { senderId , receiverId } = req.query;
+
+    try {
+
+      if ( senderId == null || receiverId == null ){
+        throw new AppError ("invalid request!",400);
+      }
+
+      const friendShipExist = await chatModel.findOne({participants: { $all: [senderId, receiverId] },});
+      
+      if ( friendShipExist){
+
+          throw new AppError("chat Already exist!",400);
+
+      }
+
+      const friendShip = await chatModel.create({
+        participants: [senderId, receiverId],
+      });
+
+      return res.status(200).json({
+        success : true,
+        message : "successfully added chat.",
+      })
+
+    } catch (error) {
+      next(error);
+    }
+}
+
+export const deleteFriendIfNoMessage = async (req, res, next) => {
+
+    const { chatId } = req.params;
+
+    try {
+
+      if ( !chatId ) {
+         throw new AppError("invalid request",400);
+      }
+
+      const chatExist = await messageModel.find({chatId});
+      
+      if (chatExist.length == 0) {
+        
+         await chatModel.findByIdAndDelete(chatId);
+
+      }
+
+      return res.status(200).json({
+        success : true,
+        message : "successfully deleted.",
+      })
+
+    } catch (error) {
+      next(error);
+    }
+}
+
+export const getChatList = async (req, res, next) => {
 
   const userId = req.user._id;
-  
-  try {
-     const chatFriends = await friendModel
-       .find({ userId })
-       .sort({ updatedAt: -1 })
-       .populate("friendId")
-       .select("lastMessage unRead");
 
-       const notificationCount = chatFriends.reduce((total, friend) => {
-         if (friend.unRead) {
-           return total + 1;
-         }
-         return total;
-       }, 0);
-       
-       
-     return res.status(200).json({
-       success: true,
-       message: "data fetched successfully",
-       friends: chatFriends,
-       notification : notificationCount
-     });
+  try {
+    const chats = await chatModel.aggregate([
+      {
+        $match: {
+          participants: {
+            $elemMatch: {
+              $eq: new mongoose.Types.ObjectId(userId),
+            },
+          },
+        },
+      },
+      {
+        $sort: {
+          updatedAt: -1,
+        },
+      },
+      {
+        // Lookup for the participants present
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "participants",
+          as: "participants",
+          pipeline: [
+            {
+              $match: {
+                _id: { $ne: new mongoose.Types.ObjectId(userId) },
+              },
+            },
+            {
+              $project: {
+                password: 0,
+                location: 0,
+              },
+            },
+          ],
+        },
+      },
+      {
+        // Lookup for the group chats
+        $lookup: {
+          from: "messages",
+          foreignField: "_id",
+          localField: "lastMessage",
+          as: "lastMessages",
+        },
+      },
+      {
+        $addFields: {
+          lastMessage: {
+            $cond: {
+              if: { $eq: [{ $size: "$lastMessages" }, 0] },
+              then: null,
+              else: { $arrayElemAt: ["$lastMessages", 0] },
+            },
+          },
+        },
+      },
+      {
+        $addFields: {
+          user: { $arrayElemAt: ["$participants", 0] },
+        },
+      },
+      {
+        $unset: "participants", // Remove the participants array
+      },
+      {
+        $unset: "lastMessages", // Remove the participants array
+      },
+    ]);
+
+    console.log("the last message is this",chats[0].lastMessage);
+
+    return res.status(200).json({
+      success: true,
+      message: "Data fetched successfully",
+      chats, // Include the fetched chats in the response
+    });
+
   } catch (error) {
     console.log(error.message);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while fetching data",
+    });
   }
- 
 };
+
 
 export const getMessage = async (req, res) => {
 
