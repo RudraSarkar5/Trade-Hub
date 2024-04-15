@@ -60,6 +60,9 @@ const chatSlice = createSlice({
         state.showChatBox = false;
         state.currentChat = null;
     },
+    sendMessage(state){  
+        state.chatUpToDate = false;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -74,5 +77,5 @@ const chatSlice = createSlice({
   },
 });
 
-export const { clearCurrentChat, updateCurrentChat } = chatSlice.actions;
+export const { clearCurrentChat, updateCurrentChat, sendMessage } = chatSlice.actions;
 export default chatSlice.reducer;

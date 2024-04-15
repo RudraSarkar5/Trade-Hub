@@ -11,7 +11,7 @@ import axios from "../../helper/axiosInstance";
 import { useContext } from "react";
 import { chatContext } from "../../contexApi/ContextProvider";
 import { useDispatch, useSelector } from "react-redux";
-import { clearCurrentChat } from "../../redux/chatSlice.js";
+import { clearCurrentChat, sendMessage } from "../../redux/chatSlice.js";
 
 const ChatBox = () => {
 
@@ -23,38 +23,16 @@ const ChatBox = () => {
   const [allMsg, setAllMsg] = useState([]);
 
  
-
-  // const { selectedFriend, socket, friends, notification, setNotification } =
-  //   useContext(chatContext);
-
-
-  // this state is contain messgae
-
-  // by these two bellow line find senderId
-  // const userDetails = JSON.parse(localStorage.getItem("userDetails"));
-  // const myId = userDetails._id;
-
-  // const currentFriend = selectedFriend;
-
-  // find the receiver Id
-  // let currentFriendId = currentFriend ? currentFriend._id : null;
-
-  // this function will send message
+  
   const msgSend = async () => {
-    // if (msg.length == 0) {
-    //   return;
-    // }
 
-    // const data = {
-    //   receiverId: currentFriendId,
-    //   senderId: myId,
-    //   message: msg,
-    // };
+    if (msg.length == 0) {
+      return;
+    }
+    await axios.post(`/chats/add-message/${currentChat.chatId}`, {content:msg});
+    dispatch(sendMessage({chat}));
+    setMsg("");
 
-    // await axios.post("/chat/add-message", data);
-    // socket.emit("message", data);
-
-    // setMsg("");
   };
 
   // useEffect(() => {
@@ -137,7 +115,7 @@ const ChatBox = () => {
     if(currentChat){
         axios
           .get(`/chats/get-messages/${currentChat.chatId}`)
-          .then(({ data }) =>setMsg(data.allMessages))
+          .then(({ data }) =>setAllMsg(data.allMessages))
           .catch((err)=>console.log(err.message));
     }
   },[currentChat])
@@ -182,6 +160,7 @@ const ChatBox = () => {
           placeholder="write your message"
           className="p-2 rounded-xl w-[70%] md:w-[80%]"
           value={msg}
+          
         />
         <button
           onClick={msgSend}
