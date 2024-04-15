@@ -161,27 +161,25 @@ export const getChatList = async (req, res, next) => {
   }
 };
 
-export const getMessage = async (req, res, next) => {
+export const getMessagesOfParticularChat = async (req, res, next) => {
 
-  const { senderId, receiverId } = req.query;
+  const { chatId } = req.params;
 
   try {
 
-    if (receiverId == null || senderId == null) {
+    if ( !chatId ) {
       throw new AppError("invalid request", 400);
     }
 
-    const conversation = await chatModel.find({
-      participant: { $all: [senderId, receiverId] },
-    }).sort({timestamp : -1});
+    const allMessages = await messageModel.find(
+        { chatId },{createdAt:0,updatedAt:0,chatId:0}).sort({ timestamp: -1 }
+      );
 
-    if (conversation) {
-      return res.status(200).json({
-        success: true,
-        messages: conversation.messages,
-      });
-    } 
-
+    return res.status(200).json({
+      success: true,
+      allMessages,
+    });
+    
   } catch (error) {
 
     next(error);

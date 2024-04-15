@@ -3,6 +3,7 @@ import ChatBox from "../../components/ChatBox/ChatBox";
 import ChatLeftUi from "../../components/ChatLeftUi/ChatLeftUi";
 import Layout from "../../Layout/Layout";
 import { useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Chat = () => {
 
@@ -12,6 +13,12 @@ const Chat = () => {
   
   const friendDetails = state?state.friendDetails:null;
   const onlyChatBox = state?state.onlyChatBox:null;
+
+  const { currentChatId } = useSelector((state)=>state.chat)
+
+  if(currentChatId){
+    setShowChat(true);
+  }
   
 
   useEffect(()=>{

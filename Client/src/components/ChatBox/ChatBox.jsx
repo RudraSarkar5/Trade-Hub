@@ -10,12 +10,16 @@ import axios from "../../helper/axiosInstance";
 
 import { useContext } from "react";
 import { chatContext } from "../../contexApi/ContextProvider";
+import { useSelector } from "react-redux";
 
 const ChatBox = ({ friend = null, chatShow }) => {
+
+  const { currentChatId } = useSelector((state) => state.chat);
+  const [allMsg, setAllMsg] = useState([]);
+
   const { selectedFriend, socket, friends, notification, setNotification } =
     useContext(chatContext);
 
-  const [allMsg, setAllMsg] = useState([]);
 
   // this state is contain messgae
   const [msg, setMsg] = useState("");
@@ -120,6 +124,15 @@ const ChatBox = ({ friend = null, chatShow }) => {
   useEffect(() => {
     scrollToLatestChats();
   }, [allMsg]);
+
+  useEffect(()=>{
+    if(currentChatId){
+        axios
+          .get(`/chats/get-messages/${currentChatId}`)
+          .then(({ data }) => setMsg(data.allMessages))
+          .catch((err)=>console.log(err.message));
+    }
+  },[currentChatId])
 
   return (
     <div className="md:w-2/3 w-full bg-gray-900 h-[100%]">

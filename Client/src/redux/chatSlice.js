@@ -1,10 +1,11 @@
-import  { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import  { createSlice, createAsyncThunk, current } from "@reduxjs/toolkit";
 import axios from "../helper/axiosInstance";
 import toast from "react-hot-toast"
 
 const initialState = {
     chatUpToDate : false,
     chatList : [],
+    currentChatId : null,
 }
 
 export const createChat = createAsyncThunk(
@@ -49,7 +50,14 @@ export const getChatList = createAsyncThunk(
 const chatSlice = createSlice({
   name: "chat",
   initialState,
-  reducers : {},
+  reducers : {
+    updateChatId(state,action){
+        state.currentChatId = action.payload.chatId;
+    },
+    clearChatId(state){
+        state.currentChatId = null;
+    },
+  },
   extraReducers : (builder)=>{
     builder
     .addCase(createChat.fulfilled,(state,action)=>{
@@ -63,5 +71,5 @@ const chatSlice = createSlice({
   }
 });
 
-
+export const { clearChatId, updateChatId } = chatSlice.actions;
 export default chatSlice.reducer;

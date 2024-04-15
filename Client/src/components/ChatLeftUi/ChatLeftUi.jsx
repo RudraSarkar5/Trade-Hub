@@ -6,7 +6,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { chatContext } from "../../contexApi/ContextProvider";
 import { useDispatch, useSelector } from "react-redux";
-import { getChatList } from "../../redux/chatSlice";
+import { getChatList, updateChatId } from "../../redux/chatSlice";
 
 const ChatLeftUi = ({ chatShow, show }) => {
   const navigate = useNavigate();
@@ -25,17 +25,19 @@ const ChatLeftUi = ({ chatShow, show }) => {
   // this will fetch userDetails from localStorage
   // const userDetails = JSON.parse(localStorage.getItem("userDetails"));
 
-  // const handleClickOnFriend = (friend) => {
-  //   navigate("/chat");
+  const handleClickOnFriend = (chatId) => {
+    console.log(chatId);
+    dispatch(updateChatId({chatId}))
+    // navigate("/chat");
 
-  //   setSelectedFriend(friend);
-  //   if (friendActiveId == friend._id) {
-  //     chatShow();
-  //   } else {
-  //     chatShow(true);
-  //   }
-  //   setFriendActiveId(friend._id);
-  // };
+    // setSelectedFriend(friend);
+    // if (friendActiveId == friend._id) {
+    //   chatShow();
+    // } else {
+    //   chatShow(true);
+    // }
+    // setFriendActiveId(friend._id);
+  };
 
   // useEffect(() => {
   //   setFriendList(friends);
@@ -83,7 +85,7 @@ const ChatLeftUi = ({ chatShow, show }) => {
               lastMessage && (
                 <div
                   key={_id}
-                  onClick={() => handleClickOnFriend(user)}
+                  onClick={() => handleClickOnFriend(_id)}
                   className={`w-full h-fit  p-4 items-center flex gap-3 bg-gray-500 ${
                     friendActiveId == user._id ? "md:bg-sky-700" : "bg-gray-500"
                   } rounded-lg`}
