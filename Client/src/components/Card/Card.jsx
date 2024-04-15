@@ -17,20 +17,21 @@ const Card = ({ user = false, value }) => {
     }
   };
   return (
-    <NavLink
-      to={`/product-info/${value._id}`}
-      className="gap-5 flex-wrap mb-12 flex-col md:flex-row flex justify-center p-5 w-full min-h-fit"
-    >
+    
       <div className="h-[400px] p-1  md:w-[30%]  grid grid-rows-12 bg-[#5387a6] shadow-lg rounded-lg">
         <div className=" row-span-1 bg-[#2c4d5f]">
           <h1 className="text-xl text-center uppercase">{value.productName}</h1>
         </div>
         <div className=" mx-auto row-span-9 bg-[#5387a6] ">
+          <NavLink
+      to={`/product-info/${value._id}`}
+    >
           <img
             src={value && value.images[0]?.secure_url}
             alt="product-image"
             className=" h-[100%] w-[100%]"
           />
+          </NavLink>
         </div>
         <div className={cardClassName}>
           <p>Price : {value.price}</p>
@@ -56,7 +57,7 @@ const Card = ({ user = false, value }) => {
           </div>
         )}
       </div>
-    </NavLink>
+    
   );
 };
 

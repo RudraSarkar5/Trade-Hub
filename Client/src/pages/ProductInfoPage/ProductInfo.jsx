@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import axios from "../../helper/axiosInstance";
 import { chatContext } from "../../contexApi/ContextProvider";
 import { useContext } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchProductDetails } from "../../redux/productSlice";
 
 const ProductInfo = () => {
@@ -13,13 +13,14 @@ const ProductInfo = () => {
   const dispatch = useDispatch();
   const [ product , setProduct ] = useState({});
 
-  const { productId } = useParams;
-  const { selectedFriend, setSelectedFriend } = useContext(chatContext);
+  const { productId } = useParams();
+  const user = useSelector((state)=>state.user.data);
+  // const { selectedFriend, setSelectedFriend } = useContext(chatContext);
 
-  const { price, description, images, productName, userId } = state;
+  // const { price, description, images, productName, userId } = state;
 
-  const userDetails = JSON.parse(localStorage.getItem("userDetails"));
-  const id = userDetails._id;
+  // const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+  // const id = userDetails._id;
 
   const [bigImage, setBigImage] = useState("");
   const [proudctImages, setProductImages] = useState([]);
@@ -30,17 +31,27 @@ const ProductInfo = () => {
 
   useEffect(() => {
       axios.get(`/products/product-details/${productId}`)
-      .then(({data})=>{console.log(data)})
+      .then(({data})=>{
+        setProduct(data.product);
+        setBigImage(data.product.images[0].secure_url);
+        setProductImages(data.product.images);
+      })
       .catch((err)=>{console.log(err)});
   }, [productId]);
 
-  useEffect(() => {
-    async function fetchSeller() {
-      const response = await axios.get(`/user/seller-details/${userId}`);
-      setSelectedFriend(response.data.value);
-    }
-    fetchSeller();
-  }, []);
+//  if(product){
+//   console.log(product);
+//  }
+
+  // useEffect(() => {
+  //   async function fetchSeller() {
+  //     const response = await axios.get(`/user/seller-details/${userId}`);
+  //     setSelectedFriend(response.data.value);
+  //   }
+  //   fetchSeller();
+  // }, []);
+
+
 
   return (
     <Layout>
@@ -53,8 +64,8 @@ const ProductInfo = () => {
               className="h-full w-full border-2 border-gray-950 p-2"
             />
           </div>
-          {images &&
-            images.map((image, idx) => (
+          {proudctImages.length &&
+            proudctImages.map((image, idx) => (
               <div key={image.public_id}>
                 <img
                   onClick={() => setBigImage(image.secure_url)}
@@ -67,8 +78,8 @@ const ProductInfo = () => {
         </div>
         <div className="w-full h-fit md:w-[45%] md:h-full   flex flex-col gap-3">
           <div className="flex justify-between">
-            <h1 className="text-3xl font-bold">{productName}</h1>
-            {userId != id && (
+            <h1 className="text-3xl font-bold">{product.productName}</h1>
+            {product.userId != user._id && (
               <div className="flex justify-center relative mt-5 items-center">
                 <button
                   onClick={connectWithSeller}
@@ -80,10 +91,12 @@ const ProductInfo = () => {
             )}
           </div>
           <div className="flex justify-center  flex-col gap-2">
-            <h1 className="text-2xl font-bold">Price: {price}</h1>
+            <h1 className="text-2xl font-bold">
+              Price: {product && product.price}
+            </h1>
           </div>
           <div>
-            <p className="text-lg">{description}</p>
+            <p className="text-lg">{product && product.description}</p>
           </div>
         </div>
       </div>

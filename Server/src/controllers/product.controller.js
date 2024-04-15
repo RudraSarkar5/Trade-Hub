@@ -6,6 +6,7 @@ import { fileRemoveFromCloud,
         fileUploadInCloudinary
        } from "../utility/fileManage.js";
 import AppError from "../utility/customError.js";
+import mongoose from "mongoose";
 
 export const getAllProducts = async (req, res, next) => {
     
@@ -85,13 +86,45 @@ export const getProductDetails = async (req, res, next) => {
 
   try {
 
-    const product = await productModel.findById(productId);
+    const product = await productModel.aggregate([
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(productId),
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "productCreater",
+          pipeline: [
+            {
+              $project: {
+                password: 0,
+                updatedAt: 0,
+                createdAt: 0,
+                email: 0,
+              },
+            },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          productOwner: { $arrayElemAt: ["$productCreater", 0] },
+        },
+      },
+      {
+        $unset: "productCreater",
+      },
+    ]);
    
     
       return res.status(200).json({
         success: true,
         message: "Product fetched successfully",
-        product,
+        product: product[0],
       });
 
   } catch (error) {
