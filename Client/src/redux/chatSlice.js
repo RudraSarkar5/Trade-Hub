@@ -5,7 +5,8 @@ import toast from "react-hot-toast"
 const initialState = {
     chatUpToDate : false,
     chatList : [],
-    currentChatId : null,
+    currentChat : {},
+    showChatBox : false,
 }
 
 export const createChat = createAsyncThunk(
@@ -50,26 +51,28 @@ export const getChatList = createAsyncThunk(
 const chatSlice = createSlice({
   name: "chat",
   initialState,
-  reducers : {
-    updateChatId(state,action){
-        state.currentChatId = action.payload.chatId;
+  reducers: {
+    updateCurrentChat(state, action) {
+      state.currentChat = action.payload.chat;
+      state.showChatBox = true;
     },
-    clearChatId(state){
-        state.currentChatId = null;
+    clearCurrentChat(state) {
+        state.showChatBox = false;
+        state.currentChat = null;
     },
   },
-  extraReducers : (builder)=>{
+  extraReducers: (builder) => {
     builder
-    .addCase(createChat.fulfilled,(state,action)=>{
-        state.chatUpToDate = false; 
-    })
+      .addCase(createChat.fulfilled, (state, action) => {
+        state.chatUpToDate = false;
+      })
 
-    .addCase(getChatList.fulfilled,(state,action)=>{
+      .addCase(getChatList.fulfilled, (state, action) => {
         state.chatList = action.payload.chats;
         state.chatUpToDate = true;
-    })
-  }
+      });
+  },
 });
 
-export const { clearChatId, updateChatId } = chatSlice.actions;
+export const { clearCurrentChat, updateCurrentChat } = chatSlice.actions;
 export default chatSlice.reducer;

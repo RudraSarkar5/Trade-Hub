@@ -7,27 +7,36 @@ import { chatContext } from "../../contexApi/ContextProvider";
 import { useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProductDetails } from "../../redux/productSlice.js";
-import { createChat } from "../../redux/chatSlice.js"
+import { createChat, updateCurrentChat } from "../../redux/chatSlice.js"
+import toast  from "react-hot-toast";
 
 
 const ProductInfo = () => {
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [ product , setProduct ] = useState({});
-  const [productOwner,setProductOwner] = useState({});
 
   const { productId } = useParams();
-  const user = useSelector((state)=>state.user.data);
-  // const { selectedFriend, setSelectedFriend } = useContext(chatContext);
+  const { isLoggedIn, userData, } = useSelector((state)=>state.user);
 
-  
-
+  const [ product , setProduct ] = useState({});
+  const [productOwner,setProductOwner] = useState({});
   const [bigImage, setBigImage] = useState("");
   const [proudctImages, setProductImages] = useState([]);
 
   const connectWithSeller = async() => {
-    const action = await dispatch(createChat({senderId : user._id, receiverId : productOwner._id}));
+    if(!isLoggedIn){
+      toast.error("Please log in first to connect with seller!");
+      return;
+    }
+    const action = await dispatch(createChat({senderId : userData._id, receiverId : productOwner._id}));
     if(action?.payload?.success){
+      const { _id  } = action.payload.chat;
+      const chat = {
+        chatId : _id,
+        chatFriend : productOwner,
+      }
+      dispatch(updateCurrentChat({chat}));
       navigate("/chat");
     }
   };
@@ -69,7 +78,7 @@ const ProductInfo = () => {
         <div className="w-full h-fit md:w-[45%] md:h-full   flex flex-col gap-3">
           <div className="flex justify-between">
             <h1 className="text-3xl font-bold">{product.productName}</h1>
-            {product.userId != user._id && (
+            {!isLoggedIn || (product.userId != userData._id) ? (
               <div className="flex justify-center relative mt-5 items-center">
                 <button
                   onClick={connectWithSeller}
@@ -78,7 +87,8 @@ const ProductInfo = () => {
                   Connect With Seller
                 </button>
               </div>
-            )}
+              ) : null 
+            }
           </div>
           <div className="flex justify-center  flex-col gap-2">
             <h1 className="text-2xl font-bold">

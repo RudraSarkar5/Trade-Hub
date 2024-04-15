@@ -6,28 +6,38 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { chatContext } from "../../contexApi/ContextProvider";
 import { useDispatch, useSelector } from "react-redux";
-import { getChatList, updateChatId } from "../../redux/chatSlice";
+import { clearCurrentChat, getChatList, updateCurrentChat } from "../../redux/chatSlice.js";
 
-const ChatLeftUi = ({ chatShow, show }) => {
+const ChatLeftUi = ({ showBox }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { friends, setSelectedFriend } = useContext(chatContext);
+  const { chatUpToDate, chatList, showChatBox, currentChat } = useSelector(
+    (state) => state.chat
+  );
+  const { userData } = useSelector((state) => state.user);
+
+  // const { friends, setSelectedFriend } = useContext(chatContext);
 
   // this will track chat state
 
   // this state will contain all friends
-  const [friendList, setFriendList] = useState([]);
+  // const [friendList, setFriendList] = useState([]);
 
   // this state will keep track the active friend chat
-  const [friendActiveId, setFriendActiveId] = useState(null);
+  // const [friendActiveId, setFriendActiveId] = useState(null);
 
   // this will fetch userDetails from localStorage
   // const userDetails = JSON.parse(localStorage.getItem("userDetails"));
 
-  const handleClickOnFriend = (chatId) => {
-    console.log(chatId);
-    dispatch(updateChatId({chatId}))
+  const handleClickOnFriend = (chat) => {
+    
+    if (currentChat?.chatId == chat.chatId){
+      console.log("they are same");
+      dispatch(clearCurrentChat());
+      return;
+    }
+    dispatch(updateCurrentChat({ chat }));
     // navigate("/chat");
 
     // setSelectedFriend(friend);
@@ -43,8 +53,7 @@ const ChatLeftUi = ({ chatShow, show }) => {
   //   setFriendList(friends);
   // }, [friends]);
 
-  const { chatUpToDate, chatList } = useSelector((state)=>state.chat);
-  const { userData } = useSelector((state) => state.user);
+  
 
   
 
@@ -54,7 +63,7 @@ const ChatLeftUi = ({ chatShow, show }) => {
     }
   }, [chatUpToDate]);
 
-  const leftBarClassName = show
+  const leftBarClassName = showChatBox
     ? "h-[100%]   md:flex flex-col bg-gray-700  hidden md:w-1/3"
     : "h-[100%]   flex flex-col bg-gray-700  w-full md:w-1/3";
 
@@ -85,9 +94,9 @@ const ChatLeftUi = ({ chatShow, show }) => {
               lastMessage && (
                 <div
                   key={_id}
-                  onClick={() => handleClickOnFriend(_id)}
+                  onClick={() => handleClickOnFriend({chatId:_id,chatFriend:user})}
                   className={`w-full h-fit  p-4 items-center flex gap-3 bg-gray-500 ${
-                    friendActiveId == user._id ? "md:bg-sky-700" : "bg-gray-500"
+                    currentChat?.chatFriend?._id == user._id ? "md:bg-sky-700" : "bg-gray-500"
                   } rounded-lg`}
                 >
                   <img

@@ -20,10 +20,10 @@ export const makeFriend = async (req, res, next) => {
       if ( friendShipExist){
 
           return res.status(200).json({
-            success : true,
-            message : "successfully fetched chat data",
-            data : friendShipExist,
-          })
+            success: true,
+            message: "successfully fetched chat data",
+            chat : friendShipExist,
+          });
 
       }
 
@@ -34,6 +34,7 @@ export const makeFriend = async (req, res, next) => {
       return res.status(200).json({
         success : true,
         message : "successfully added chat.",
+        chat : friendShip,
       })
 
     } catch (error) {

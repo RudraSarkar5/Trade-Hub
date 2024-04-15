@@ -14,25 +14,35 @@ const Chat = () => {
   const friendDetails = state?state.friendDetails:null;
   const onlyChatBox = state?state.onlyChatBox:null;
 
-  const { currentChatId } = useSelector((state)=>state.chat)
+  const { showChatBox } = useSelector((state)=>state.chat)
 
-  if(currentChatId){
-    setShowChat(true);
-  }
-  
-
-  useEffect(()=>{
-    if(!state){
-      setShowChat(false)
-    }
-  },[state])
- 
+  console.log(showChatBox);
 
   useEffect(() => {
-    if (onlyChatBox) {
+    if (showChatBox) {
       setShowChat(true);
+    }else{
+      setShowChat(false);
     }
-  }, [onlyChatBox]);
+  }, [showChatBox]);
+
+  // if (showChatBox) {
+  //   setShowChat(true);
+  // }
+  
+
+  // useEffect(()=>{
+  //   if(!state){
+  //     setShowChat(false)
+  //   }
+  // },[state])
+ 
+
+  // useEffect(() => {
+  //   if (onlyChatBox) {
+  //     setShowChat(true);
+  //   }
+  // }, [onlyChatBox]);
 
 
   
@@ -43,9 +53,9 @@ const Chat = () => {
   return (
     <Layout>
       <div className="md:h-[85vh] h-[90vh] w-screen relative flex gap-2  bg-green-900">
-        <ChatLeftUi show={showChat} chatShow={handleClick} />
+        <ChatLeftUi showBox = {showChat}  />
         {showChat ? (
-          <ChatBox friend={friendDetails} chatShow={handleClick} />
+          <ChatBox chatShow={handleClick} />
         ) : (
           <div className=" bg-green-900 hidden md:flex m-auto">
             Welcome to chat{" "}
