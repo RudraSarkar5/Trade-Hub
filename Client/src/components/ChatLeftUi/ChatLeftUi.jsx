@@ -9,53 +9,25 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearCurrentChat, getChatList, updateCurrentChat } from "../../redux/chatSlice.js";
 
 const ChatLeftUi = ({ showBox }) => {
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { chatUpToDate, chatList, showChatBox, currentChat } = useSelector(
-    (state) => state.chat
-  );
+  const { chatUpToDate,
+          chatList,
+          showChatBox,
+           currentChat } = useSelector((state) => state.chat);
   const { userData } = useSelector((state) => state.user);
-
-  // const { friends, setSelectedFriend } = useContext(chatContext);
-
-  // this will track chat state
-
-  // this state will contain all friends
-  // const [friendList, setFriendList] = useState([]);
-
-  // this state will keep track the active friend chat
-  // const [friendActiveId, setFriendActiveId] = useState(null);
-
-  // this will fetch userDetails from localStorage
-  // const userDetails = JSON.parse(localStorage.getItem("userDetails"));
 
   const handleClickOnFriend = (chat) => {
     
     if (currentChat?.chatId == chat.chatId){
-      console.log("they are same");
       dispatch(clearCurrentChat());
       return;
     }
     dispatch(updateCurrentChat({ chat }));
-    // navigate("/chat");
 
-    // setSelectedFriend(friend);
-    // if (friendActiveId == friend._id) {
-    //   chatShow();
-    // } else {
-    //   chatShow(true);
-    // }
-    // setFriendActiveId(friend._id);
   };
-
-  // useEffect(() => {
-  //   setFriendList(friends);
-  // }, [friends]);
-
-  
-
-  
 
   useEffect(() => {
     if(!chatUpToDate){

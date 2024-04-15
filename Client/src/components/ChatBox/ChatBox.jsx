@@ -13,7 +13,7 @@ import { chatContext } from "../../contexApi/ContextProvider";
 import { useDispatch, useSelector } from "react-redux";
 import { clearCurrentChat } from "../../redux/chatSlice.js";
 
-const ChatBox = ({ chatShow }) => {
+const ChatBox = () => {
 
   const dispatch = useDispatch();
 

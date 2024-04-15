@@ -12,9 +12,11 @@ const Profile = () => {
   
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { userData, isUpToDate } = useSelector((state) => state?.user);
+  const { products, productUpToDate } = useSelector((state) => state?.userProducts);
+  
   const [showProducts, setShowProducts] = useState(true);
-  
-  
 
   const handleShowProduct = () => {
     setShowProducts(true);
@@ -23,10 +25,6 @@ const Profile = () => {
   const handleAddProduct = () => {
     setShowProducts(false);
   };
-
-  // const handleShowProducts = () => {
-  //   setShowProducts(true);
-  // };
 
   const handleLogOut = async () => {
     const action = await dispatch(logOut());
@@ -44,9 +42,7 @@ const Profile = () => {
     }
   };
 
-  const { userData , isUpToDate } = useSelector((state) => state?.user);
-  const { products, productUpToDate } = useSelector((state) => state?.userProducts
-  );
+  
 
   useEffect(() => {
     if (!productUpToDate) {

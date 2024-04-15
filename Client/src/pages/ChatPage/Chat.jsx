@@ -7,17 +7,10 @@ import { useSelector } from "react-redux";
 
 const Chat = () => {
 
+  const { showChatBox } = useSelector((state)=>state.chat)
+  
   const [showChat, setShowChat] = useState(false);
   
-  const {state} = useLocation();
-  
-  const friendDetails = state?state.friendDetails:null;
-  const onlyChatBox = state?state.onlyChatBox:null;
-
-  const { showChatBox } = useSelector((state)=>state.chat)
-
-  console.log(showChatBox);
-
   useEffect(() => {
     if (showChatBox) {
       setShowChat(true);
@@ -26,36 +19,13 @@ const Chat = () => {
     }
   }, [showChatBox]);
 
-  // if (showChatBox) {
-  //   setShowChat(true);
-  // }
-  
-
-  // useEffect(()=>{
-  //   if(!state){
-  //     setShowChat(false)
-  //   }
-  // },[state])
- 
-
-  // useEffect(() => {
-  //   if (onlyChatBox) {
-  //     setShowChat(true);
-  //   }
-  // }, [onlyChatBox]);
-
-
-  
-  const handleClick = (value = !showChat) => {
-    setShowChat(value);
-  };
 
   return (
     <Layout>
       <div className="md:h-[85vh] h-[90vh] w-screen relative flex gap-2  bg-green-900">
         <ChatLeftUi showBox = {showChat}  />
         {showChat ? (
-          <ChatBox chatShow={handleClick} />
+          <ChatBox />
         ) : (
           <div className=" bg-green-900 hidden md:flex m-auto">
             Welcome to chat{" "}
