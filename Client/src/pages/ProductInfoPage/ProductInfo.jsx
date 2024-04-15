@@ -6,27 +6,30 @@ import axios from "../../helper/axiosInstance";
 import { chatContext } from "../../contexApi/ContextProvider";
 import { useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProductDetails } from "../../redux/productSlice";
+import { fetchProductDetails } from "../../redux/productSlice.js";
+import { createChat } from "../../redux/chatSlice.js"
+
 
 const ProductInfo = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [ product , setProduct ] = useState({});
+  const [productOwner,setProductOwner] = useState({});
 
   const { productId } = useParams();
   const user = useSelector((state)=>state.user.data);
   // const { selectedFriend, setSelectedFriend } = useContext(chatContext);
 
-  // const { price, description, images, productName, userId } = state;
-
-  // const userDetails = JSON.parse(localStorage.getItem("userDetails"));
-  // const id = userDetails._id;
+  
 
   const [bigImage, setBigImage] = useState("");
   const [proudctImages, setProductImages] = useState([]);
 
-  const connectWithSeller = () => {
-    navigate("/chat", { state: { onlyChatBox: true } });
+  const connectWithSeller = async() => {
+    const action = await dispatch(createChat({senderId : user._id, receiverId : productOwner._id}));
+    if(action?.payload?.success){
+      navigate("/chat");
+    }
   };
 
   useEffect(() => {
@@ -35,23 +38,10 @@ const ProductInfo = () => {
         setProduct(data.product);
         setBigImage(data.product.images[0].secure_url);
         setProductImages(data.product.images);
+        setProductOwner(data.product.productOwner);
       })
       .catch((err)=>{console.log(err)});
   }, [productId]);
-
-//  if(product){
-//   console.log(product);
-//  }
-
-  // useEffect(() => {
-  //   async function fetchSeller() {
-  //     const response = await axios.get(`/user/seller-details/${userId}`);
-  //     setSelectedFriend(response.data.value);
-  //   }
-  //   fetchSeller();
-  // }, []);
-
-
 
   return (
     <Layout>

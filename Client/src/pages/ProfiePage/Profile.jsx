@@ -44,7 +44,7 @@ const Profile = () => {
     }
   };
 
-  const { data , isUpToDate } = useSelector((state) => state?.user);
+  const { userData , isUpToDate } = useSelector((state) => state?.user);
   const { products, productUpToDate } = useSelector((state) => state?.userProducts
   );
 
@@ -56,11 +56,10 @@ const Profile = () => {
 
   return (
     <Layout>
-
       <div className="">
-        {data && (
+        {userData && (
           <UserDetails
-            user={data}
+            user={userData}
             deleteProfile={handleDelete}
             logOutProfile={handleLogOut}
           />

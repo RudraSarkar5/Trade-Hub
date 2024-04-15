@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 const initialState = {
   isUpToDate : false,
   isLoggedIn:  false,
-  data :  {},
+  userData :  {},
 };
 
 
@@ -135,35 +135,35 @@ const userSlice = createSlice({
       .addCase(createAccount.fulfilled,(state,action)=>{
         state.isUpToDate = true;
         state.isLoggedIn = true;
-        state.data = action?.payload?.user;
+        state.userData = action?.payload?.user;
       })
 
       .addCase(login.fulfilled,(state,action)=>{
        state.isUpToDate = true;
        state.isLoggedIn = true;
-       state.data = action?.payload?.user;
+       state.userData = action?.payload?.user;
       })
 
       .addCase(logOut.fulfilled,(state,action)=>{
         state.isLoggedIn = false;
-        state.data = {};
+        state.userData = {};
         state.isUpToDate = false;
       })
 
       .addCase(userDelete.fulfilled,(state,action)=>{
         state.isLoggedIn = false;
-        state.data = {};
+        state.userData = {};
         state.isUpToDate = false;
       })
 
       .addCase(getUserDetails.fulfilled,(state,action)=>{
         state.isLoggedIn = true;
-        state.data = action.payload.user;
+        state.userData = action.payload.user;
         state.isUpToDate = true;
       })
 
       .addCase(editProfile.fulfilled,(state,action)=>{
-        state.data = action.payload.user;
+        state.userData = action.payload.user;
         state.isUpToDate=false;
       })
       

@@ -5,9 +5,12 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 
 import { useContext } from "react";
 import { chatContext } from "../../contexApi/ContextProvider";
+import { useDispatch, useSelector } from "react-redux";
+import { getChatList } from "../../redux/chatSlice";
 
 const ChatLeftUi = ({ chatShow, show }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const { friends, setSelectedFriend } = useContext(chatContext);
 
@@ -20,23 +23,34 @@ const ChatLeftUi = ({ chatShow, show }) => {
   const [friendActiveId, setFriendActiveId] = useState(null);
 
   // this will fetch userDetails from localStorage
-  const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+  // const userDetails = JSON.parse(localStorage.getItem("userDetails"));
 
-  const handleClickOnFriend = (friend) => {
-    navigate("/chat");
+  // const handleClickOnFriend = (friend) => {
+  //   navigate("/chat");
 
-    setSelectedFriend(friend);
-    if (friendActiveId == friend._id) {
-      chatShow();
-    } else {
-      chatShow(true);
-    }
-    setFriendActiveId(friend._id);
-  };
+  //   setSelectedFriend(friend);
+  //   if (friendActiveId == friend._id) {
+  //     chatShow();
+  //   } else {
+  //     chatShow(true);
+  //   }
+  //   setFriendActiveId(friend._id);
+  // };
+
+  // useEffect(() => {
+  //   setFriendList(friends);
+  // }, [friends]);
+
+  const { chatUpToDate, chatList } = useSelector((state)=>state.chat);
+  const { userData } = useSelector((state) => state.user);
+
+  
 
   useEffect(() => {
-    setFriendList(friends);
-  }, [friends]);
+    if(!chatUpToDate){
+       dispatch(getChatList());
+    }
+  }, [chatUpToDate]);
 
   const leftBarClassName = show
     ? "h-[100%]   md:flex flex-col bg-gray-700  hidden md:w-1/3"
@@ -50,51 +64,54 @@ const ChatLeftUi = ({ chatShow, show }) => {
         </Link>
         <img
           src={
-            userDetails.avatar.public_id.length === 0
-              ? "./src/assets/avatar.png"
-              : userDetails.avatar.secure_url
+            userData?.avatar?.userUploaded
+              ? userData?.avatar?.secure_url
+              : "./src/assets/avatar.png"
           }
           alt="profile Photo"
           width={25}
           className="rounded-lg"
         />
-        <h1>{userDetails && userDetails.name}</h1>
+        <h1>{userData && userData.name}</h1>
       </div>
 
       <div className="w-full overflow-y-scroll  h-full space-y-2">
-        {friendList?.length > 0 &&
-          friendList.map((friend, idx) => (
-            <div
-              key={friend.friendId._id}
-              onClick={() => handleClickOnFriend(friend.friendId)}
-              className={`w-full h-fit  p-4 items-center flex gap-3 bg-gray-500 ${
-                friendActiveId == friend.friendId._id
-                  ? "md:bg-sky-700"
-                  : "bg-gray-500"
-              } rounded-lg`}
-            >
-              <img
-                src={
-                  friend.friendId?.avatar.public_id.length == 0
-                    ? "./src/assets/avatar.png"
-                    : friend.friendId?.avatar.secure_url
-                }
-                alt="friendPhoto"
-                width={25}
-                className="rounded-lg"
-              />
-              <div>
-                <h1 className=" text-xl text-black">{friend.friendId.name}</h1>
-                <p
-                  className={` text-xl ${
-                    friend.unRead ? "text-yellow-500 " : "text-white "
-                  }`}
+        {chatList?.length > 0 &&
+          chatList.map(
+            ({ user, _id, unRead, lastMessage }) =>
+            (
+              lastMessage && (
+                <div
+                  key={_id}
+                  onClick={() => handleClickOnFriend(user)}
+                  className={`w-full h-fit  p-4 items-center flex gap-3 bg-gray-500 ${
+                    friendActiveId == user._id ? "md:bg-sky-700" : "bg-gray-500"
+                  } rounded-lg`}
                 >
-                  {friend.lastMessage}
-                </p>
-              </div>
-            </div>
-          ))}
+                  <img
+                    src={
+                      user?.avatar.userUploaded == false
+                        ? "./src/assets/avatar.png"
+                        : user?.avatar.secure_url
+                    }
+                    alt="friendPhoto"
+                    width={25}
+                    className="rounded-lg"
+                  />
+                  <div>
+                    <h1 className=" text-xl text-black">{user?.name}</h1>
+                    <p
+                      className={` text-xl ${
+                        unRead ? "text-yellow-500 " : "text-white "
+                      }`}
+                    >
+                      {lastMessage.content}
+                    </p>
+                  </div>
+                </div>
+              )
+            )
+          )}
       </div>
     </div>
   );
