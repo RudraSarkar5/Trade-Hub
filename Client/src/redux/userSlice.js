@@ -2,13 +2,11 @@ import { createSlice , createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "../helper/axiosInstance";
 import toast from "react-hot-toast";
 
-
 const initialState = {
   isUpToDate : false,
   isLoggedIn:  false,
   userData :  {},
 };
-
 
 // api call for user creation using createAsyncThunk
 export const createAccount = createAsyncThunk(

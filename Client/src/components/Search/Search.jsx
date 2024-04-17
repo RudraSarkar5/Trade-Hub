@@ -1,9 +1,5 @@
-
-
-
-
-
 const Search = ({ setSearch }) => {
+  
   const handleSearch = (e) => {
     setSearch(e.target.value);
   };

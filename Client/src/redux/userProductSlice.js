@@ -102,14 +102,10 @@ const userProductSlice = createSlice({
             state.products = action?.payload?.products;
           })
 
-          // .addCase(getUserProducts.rejected, (state, action) => {
-          //   state.needProductReLoad = false;
-          //   state.products = [];
-          //   state.productNumber = 0;
-          // })
           .addCase(deleteProduct.fulfilled, (state, action) => {
             state.productUpToDate = true;
           })
+          
           .addCase(updateProduct.fulfilled, (state, action) => {
             state.productUpToDate = false;
           });

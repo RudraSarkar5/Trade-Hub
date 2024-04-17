@@ -2,11 +2,10 @@ import mongoose from "mongoose";
 import { DB_NAME } from "../constants.js";
 import { envObject } from "./envConfig.js";
 
-// this function will connnect databases
+
 const dbconnection = async () => {
 
   try {
-
     mongoose.connection.on("connected",()=>{
       console.log("database connected successfully.");
     })

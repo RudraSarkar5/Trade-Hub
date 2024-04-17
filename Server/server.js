@@ -27,17 +27,14 @@ io.on("connection", (socket) => {
 
   socket.on("setConnection",({myId,chatId})=>{
      connectionMap.set(myId, chatId);
-     console.log("set connection");
-     console.log(connectionMap);
   });
 
   socket.on("destroyConnection",({myId})=>{
      connectionMap.delete(myId);
-     console.log("destroy connection");
   });
 
   socket.on("message", async ({ message, senderId, receiverId , chatId }) => {
-    //  console.log(connectionMap);
+    
     if (
       !(
         connectionMap.has(receiverId) && connectionMap.get(receiverId) == chatId
@@ -46,7 +43,7 @@ io.on("connection", (socket) => {
       await makeUnRead(chatId);
     }
 
-    // Send the message to the receiver
+    
     io.to(receiverId).emit("message", {
       senderId,
       receiverId,

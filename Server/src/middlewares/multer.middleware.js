@@ -9,9 +9,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // Define the destination directory as a relative path
 const destinationDirectory = path.join(__dirname, "../../public/upload");
 
-
-
-
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, destinationDirectory);

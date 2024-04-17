@@ -1,6 +1,5 @@
 import messageModel from "../models/message.model.js";
 import chatModel from "../models/chat.model.js";
-import UserModel from "../models/user.model.js";
 import AppError from "../utility/customError.js";
 import mongoose from "mongoose";
 

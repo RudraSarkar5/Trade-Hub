@@ -21,13 +21,10 @@ const useNotification = ()=>{
 const ContextProvider = ({ children }) => {
 
   const dispatch = useDispatch();
-  
   const { isLoggedIn, isUpToDate, userData } = useSelector((state) => state.user);
-
   const [ socketConnected, setSocketConnected ] = useState(false);
   const [ notification, setNotification ] = useState(0);
   const [ modifyNofication , setModifyNotication ] = useState(true);
-
 
   const socketSetUp = ()=>{
        socket.connect();
@@ -53,6 +50,7 @@ const ContextProvider = ({ children }) => {
   },[isUpToDate]);
 
   useEffect(() => {
+    
     if (isLoggedIn) {
       socketSetUp();
       axios.get("/chats/get-notification")

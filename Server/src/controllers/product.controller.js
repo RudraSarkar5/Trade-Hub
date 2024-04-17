@@ -47,7 +47,7 @@ export const getAllProducts = async (req, res, next) => {
          messgae: "successfully fetched data",
          products,
          numberOfButton,
-         isNextButtonAvailable
+         isNextButtonAvailable,
        });
   
     } catch (error) {

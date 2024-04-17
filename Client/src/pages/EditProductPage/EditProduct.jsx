@@ -6,10 +6,10 @@ import { addProduct, updateProduct } from "../../redux/userProductSlice";
 import Layout from "../../Layout/Layout";
 
 const EditProduct = () => {
+
   const {state} =  useLocation();
   const {productName,description,category,price,_id} = state;
   
-
   const [productData, setProductData] = useState({
     productName,
     description,
@@ -17,7 +17,6 @@ const EditProduct = () => {
     price
   });
   
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -36,6 +35,7 @@ const EditProduct = () => {
       [name]: files,
     });
   };
+
   const handleSubmit = async(e) => {
     e.preventDefault();
     if (
@@ -48,7 +48,6 @@ const EditProduct = () => {
       return;
     }
    
-
     const productFormData = new FormData();
     productFormData.append("productName", productData.productName);
     productFormData.append("price", productData.price);
@@ -64,12 +63,12 @@ const EditProduct = () => {
          productFormData.append("images", productData.images[i]);
        }
      }
-    // console.log(productFormData,_id);
+    
     const action = await dispatch(updateProduct({productFormData,_id}));
     if (action.payload?.success) {
       navigate("/profile");
-      
     }
+    
   };
 
   return (

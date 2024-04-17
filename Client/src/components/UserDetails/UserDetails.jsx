@@ -1,5 +1,6 @@
 import { Link, NavLink } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
+
 const UserDetails = ({ user, deleteProfile, logOutProfile }) => {
   
   return (

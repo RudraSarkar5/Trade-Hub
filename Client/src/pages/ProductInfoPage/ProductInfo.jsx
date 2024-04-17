@@ -1,4 +1,4 @@
-import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 import Layout from "../../Layout/Layout";
 import { useEffect, useId, useState } from "react";
 import { Link } from "react-router-dom";
@@ -32,29 +32,22 @@ const ProductInfo = () => {
     
     
     const action = await dispatch(createChat({senderId : userData._id, receiverId : productOwner._id}));
+    
     if(action?.payload?.success){
 
       let needMarkRead = false;
-
       const { _id , unRead , lastMessage } = action.payload.chat;
       
       if ( lastMessage ){
 
         try {
-
           const { data } = await axios.get(`/chats/single-messageData/:${lastMessage}`);
-          
         } catch (error) {
-          console.log("here error");
           console.log(error.message);
-        
         }
-
                                         
         if ( (data.messageData.senderId != userData._id) && (unRead == true) ) {
-
                needMarkRead = true;
-
          }                    
 
       }

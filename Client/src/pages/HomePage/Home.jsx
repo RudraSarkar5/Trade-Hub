@@ -20,8 +20,6 @@ const Home = () => {
     starting: 1,
   });
 
-
-
   const { numberOfButtonPage, products, isNextButtonAvailable } = useSelector(
     (state) => state.products
   );

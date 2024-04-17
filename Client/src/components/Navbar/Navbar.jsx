@@ -4,15 +4,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useContext, useEffect } from "react";
 import { useNotification } from "../../contexApi/ContextProvider";
 
-
 const Navbar = () => {
 
   const { notification } = useNotification();
-  
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
-
-  
-  
 
   return (
     <div className="w-screen fixed top-0 z-10  px-1 bg-[#1f5376] py-2 h-fit flex items-center justify-between">

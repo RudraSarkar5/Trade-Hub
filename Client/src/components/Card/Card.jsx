@@ -3,6 +3,7 @@ import { deleteProduct } from "../../redux/userProductSlice";
 import { useDispatch } from "react-redux";
 
 const Card = ({ user = false, value }) => {
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -16,8 +17,8 @@ const Card = ({ user = false, value }) => {
       navigate("/profile");
     }
   };
+
   return (
-    
       <div className="h-[400px] p-1  md:w-[30%]  grid grid-rows-12 bg-[#5387a6] shadow-lg rounded-lg">
         <div className=" row-span-1 bg-[#2c4d5f]">
           <h1 className="text-xl text-center uppercase">{value.productName}</h1>
@@ -35,10 +36,6 @@ const Card = ({ user = false, value }) => {
         </div>
         <div className={cardClassName}>
           <p>Price : {value.price}</p>
-
-          {/* <button className="px-4 py-1 bg-blue-500 text-black hover:bg-green-500 rounded-lg ">
-            Info
-          </button> */}
         </div>
         {user && (
           <div className="  row-span-1 flex justify-around items-center bg-[#29495b]">
@@ -57,7 +54,6 @@ const Card = ({ user = false, value }) => {
           </div>
         )}
       </div>
-    
   );
 };
 

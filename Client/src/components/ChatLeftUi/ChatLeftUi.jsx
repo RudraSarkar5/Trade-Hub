@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import axios from "../../helper/axiosInstance";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-
 import { useContext } from "react";
 import { chatContext } from "../../contexApi/ContextProvider";
 import { useDispatch, useSelector } from "react-redux";
@@ -44,9 +43,11 @@ const ChatLeftUi = ({ showBox }) => {
   };
 
   useEffect(() => {
+
     if(!chatUpToDate){
        dispatch(getChatList());
     }
+
   }, [chatUpToDate]);
 
   const leftBarClassName = showChatBox
@@ -71,7 +72,6 @@ const ChatLeftUi = ({ showBox }) => {
         />
         <h1>{userData && userData.name}</h1>
       </div>
-
       <div className="w-full overflow-y-scroll  h-full space-y-2">
         {chatList?.length > 0 &&
           chatList.map(

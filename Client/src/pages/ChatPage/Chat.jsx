@@ -2,10 +2,9 @@ import React, { useState,useEffect } from "react";
 import ChatBox from "../../components/ChatBox/ChatBox";
 import ChatLeftUi from "../../components/ChatLeftUi/ChatLeftUi";
 import Layout from "../../Layout/Layout";
-import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useNotification } from "../../contexApi/ContextProvider";
-// import 
+
 
 const Chat = () => {
 

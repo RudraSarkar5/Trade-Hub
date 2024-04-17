@@ -28,7 +28,9 @@ const AddProduct = ({ controlShowProduct }) => {
   };
 
   const handleSubmit = async (e) => {
+
     e.preventDefault();
+    
     if (
       !productData.productName ||
       !productData.description ||
@@ -58,12 +60,13 @@ const AddProduct = ({ controlShowProduct }) => {
     }
 
     const action = await dispatch(addProduct(productFormData));
-    console.log(action);
+
     if (action?.payload?.success) {
       console.log("all good");
       navigate("/profile");
       controlShowProduct();
     }
+
   };
 
   return (
