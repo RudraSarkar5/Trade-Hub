@@ -3,14 +3,14 @@ import mongoose from "mongoose";
 const messageSchema = new mongoose.Schema(
   {
     senderId: {
-      type: mongoose.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "user",
     },
     content: {
       type: String,
     },
     chatId: {
-      type: mongoose.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "chat",
     },
   },
@@ -18,7 +18,6 @@ const messageSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
 
 const messageModel = mongoose.model("message", messageSchema);
 export default messageModel;

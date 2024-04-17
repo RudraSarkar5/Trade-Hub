@@ -1,79 +1,54 @@
 import { createContext, useEffect, useState } from "react";
-// import { io } from "socket.io-client";
-// import axios from "../helper/axiosInstance";
-// import { socket } from "../helper/socket";
+import { socket } from "../helper/socket.js";
 import { useDispatch , useSelector } from "react-redux";
 import {getUserDetails} from "../redux/userSlice.js"
-
+import { updateChatList } from "../redux/chatSlice.js";
 export const chatContext = createContext(null);
-//  const socket = io(import.meta.env.VITE_BACK_END_URL);
+
 
 const ContextProvider = ({ children }) => {
 
   const dispatch = useDispatch();
-  const { isLoggedIn, isUpToDate, data } = useSelector((state) => state.user);
+  
+  const { isLoggedIn, isUpToDate, userData } = useSelector((state) => state.user);
+
+  const socketSetUp = ()=>{
+       socket.connect()
+       socket.emit("join", userData._id);
+  }
+
+  const handleMessage = ({ senderId, receiverId, content, chatId }) => {
+        if (userData._id == senderId || userData._id == receiverId) {
+          dispatch(updateChatList());
+        }
+  }      
 
   useEffect(()=>{
     if ( !isUpToDate ){
       dispatch(getUserDetails());
     }
   },[isUpToDate]);
- 
-  // const userDetails = JSON.parse(localStorage.getItem("userDetails"));
-  // const myId = userDetails ? userDetails._id : null;
 
-  // const [friends, setFriends] = useState([]);
-  // const [notification, setNotification] = useState(0);
-  // const [selectedFriend, setSelectedFriend] = useState(null);
+  useEffect(()=>{
 
+     if (isLoggedIn) {
+       socketSetUp();
+     }
 
-
-  // const fetchFriends = async () => {
-  //   try {
-      
-  //     console.log("connected socket");
-  //     const response = await axios.get("/chat/get-friends");
-  //     const { friends, notification } = response.data; 
-  //     setFriends(friends);
-  //     setNotification(notification);
-  //   } catch (error) {
-  //     console.error("Error fetching friends:", error);
-  //   }
-  // };
-
-  
-
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     if (myId) {
-  //       socket.emit("join", myId);
-  //       await fetchFriends();
-        
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
-
-  // useEffect(() => {
-  //   socket.on("message", async ({ receiverId, senderId, message }) => {
-  //     await fetchFriends();
-  //   });
-  //   return ()=>{
-  //     socket.off("message");
-  //   }
-  // }, [socket]);
+    if ( userData){
+      socket.on("message", handleMessage);
+    }
+    
+    return ()=>{
+      socket.on("message", handleMessage);
+    }
+  },[socket,userData,isLoggedIn])
 
   return (
     <chatContext.Provider
       value={{
-        // socket,
-        // friends,
         // notification,
         // setNotification,
-        // selectedFriend,
-        // setSelectedFriend,
       }}
     >
       {children}

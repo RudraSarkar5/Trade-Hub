@@ -48,6 +48,18 @@ export const getChatList = createAsyncThunk(
     }
 )
 
+export const makeReadLastMessage = createAsyncThunk(
+  "action/makeReadLastMessage",
+  async ({chatId}) => {
+    try {
+      const response = await axios.patch(`/chats/make-read/${chatId}`);
+      return response.data;
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+);
+
 const chatSlice = createSlice({
   name: "chat",
   initialState,
@@ -60,7 +72,7 @@ const chatSlice = createSlice({
         state.showChatBox = false;
         state.currentChat = null;
     },
-    sendMessage(state){  
+    updateChatList(state){  
         state.chatUpToDate = false;
     }
   },
@@ -73,9 +85,13 @@ const chatSlice = createSlice({
       .addCase(getChatList.fulfilled, (state, action) => {
         state.chatList = action.payload.chats;
         state.chatUpToDate = true;
-      });
+      })
+
+      .addCase(makeReadLastMessage.fulfilled,(state)=>{
+        state.chatUpToDate = false;
+      })
   },
 });
 
-export const { clearCurrentChat, updateCurrentChat, sendMessage } = chatSlice.actions;
+export const { clearCurrentChat, updateCurrentChat, updateChatList } = chatSlice.actions;
 export default chatSlice.reducer;

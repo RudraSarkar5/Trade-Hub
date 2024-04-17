@@ -3,7 +3,7 @@ import { IoMdArrowBack } from "react-icons/io";
 import UserMessage from "../Messages/UserMessage";
 import FriedMessage from "../Messages/FriendMessage";
 
-// import { socket } from "../../helper/socket";
+import { socket } from "../../helper/socket";
 import { useLocation, useParams } from "react-router-dom";
 import Layout from "../../Layout/Layout";
 import axios from "../../helper/axiosInstance";
@@ -11,96 +11,44 @@ import axios from "../../helper/axiosInstance";
 import { useContext } from "react";
 import { chatContext } from "../../contexApi/ContextProvider";
 import { useDispatch, useSelector } from "react-redux";
-import { clearCurrentChat, sendMessage } from "../../redux/chatSlice.js";
+import { clearCurrentChat, makeReadLastMessage } from "../../redux/chatSlice.js";
+import { makeRead } from "../../../../Server/src/controllers/chat.controller.js";
 
 const ChatBox = () => {
-
   const dispatch = useDispatch();
 
   const { currentChat } = useSelector((state) => state.chat);
+  
   const { userData } = useSelector((state) => state.user);
   const [msg, setMsg] = useState("");
   const [allMsg, setAllMsg] = useState([]);
 
- 
-  
   const msgSend = async () => {
-
     if (msg.length == 0) {
       return;
     }
-    await axios.post(`/chats/add-message/${currentChat.chatId}`, {content:msg});
-    dispatch(sendMessage({chat}));
+    await axios.post(`/chats/add-message/${currentChat.chatId}`, {
+      content: msg,
+    });
+    socket.emit("message", { 
+      senderId : userData._id ,
+      receiverId : currentChat?.chatFriend?._id ,
+      chatId : currentChat?.chatId ,
+      message : msg });
     setMsg("");
-
   };
 
-  // useEffect(() => {
-  //   socket.emit("setConnection", { myId, friendId: currentFriendId });
+  const messageHandler = ({ senderId, receiverId, content, chatId }) => {
+    const msgObj = {
+      senderId,
+      content,
+      chatId,
+    };
 
-  //   const fetchData = async () => {
-  //     const { data } = await axios.post("/chat/make-read", {
-  //       senderId: myId,
-  //       receiverId: currentFriendId,
-  //     });
-
-  //     friends.find((friend) => {
-  //       if (friend.friendId._id == data.receiverId) {
-  //         if (friend.unRead == true) {
-  //           friend.unRead = false;
-  //           setNotification(notification - 1);
-  //         }
-  //       }
-  //     });
-
-  //     const response = await axios.get(
-  //       `/chat/get-message?senderId=${myId}&receiverId=${currentFriendId}`
-  //     );
-
-  //     setAllMsg(response.data.messages);
-  //   };
-
-  //   // this function will fetch all message between current friend and user
-
-  //   if (currentFriendId) {
-  //     fetchData();
-  //   }
-
-  //   // return ()=>{
-  //   //   socket.emit("destroyConnection",{myId,friendId:currentFriendId});
-  //   // }
-  // }, [selectedFriend]);
-
-  // useEffect(() => {
-  //   const handleBeforeUnload = () => {
-  //     // Emit the destroyConnection event
-  //     socket.emit("destroyConnection", { myId, friendId: currentFriendId });
-  //   };
-
-  //   // Add the event listener
-  //   window.addEventListener("beforeunload", handleBeforeUnload);
-
-  //   // Clean up the event listener
-  //   return () => {
-  //     window.removeEventListener("beforeunload", handleBeforeUnload);
-  //   };
-  // }, [socket, myId, currentFriendId]);
-
-  // useEffect(() => {
-  //   // Listen for incoming messages
-  //   socket.on("message", ({ senderId, receiverId, message }) => {
-  //     const msgObj = {
-  //       senderId,
-  //       content: message,
-  //     };
-
-  //     if (senderId == myId || senderId == currentFriendId) {
-  //       setAllMsg((prev) => [...prev, msgObj]);
-  //     }
-  //   });
-  // }, [socket]);
-
-  
+    if (chatId == currentChat.chatId) {
+      setAllMsg((prev) => [...prev, msgObj]);
+    }
+  };
 
   function scrollToLatestChats() {
     let chatBox = document.getElementsByClassName("chatBox")[0];
@@ -111,14 +59,48 @@ const ChatBox = () => {
     scrollToLatestChats();
   }, [allMsg]);
 
-  useEffect(()=>{
-    if(currentChat){
-        axios
-          .get(`/chats/get-messages/${currentChat.chatId}`)
-          .then(({ data }) =>setAllMsg(data.allMessages))
-          .catch((err)=>console.log(err.message));
+  useEffect(() => {
+    if (currentChat) {
+      axios
+        .get(`/chats/get-messages/${currentChat.chatId}`)
+        .then(({ data }) => setAllMsg(data.allMessages))
+        .catch((err) => console.log(err.message));
     }
-  },[currentChat])
+    if (currentChat?.chatId && userData) {
+      socket.emit("setConnection", {
+        myId: userData._id,
+        chatId : currentChat.chatId,
+      });
+    }
+
+    if (currentChat?.needMarkRead){
+      dispatch(makeReadLastMessage({chatId : currentChat.chatId}));
+    }
+
+    return () => {
+      if ( userData ) {
+        socket.emit("destroyConnection", {
+          myId: userData._id,
+        });
+      }
+      dispatch(clearCurrentChat());
+      if(currentChat){
+
+        // this api call will delete chat record if the particular chat have no message
+        axios.delete(`/chats/check-empty-chat/${currentChat.chatId}`);
+
+      }
+    };
+  }, [currentChat, userData]);
+
+  useEffect(() => {
+    // Listen for incoming messages
+    socket.on("message", messageHandler );
+    
+    return ()=>{
+      socket.off("message", messageHandler);
+    }
+  }, [socket]);
 
   return (
     <div className="md:w-2/3 w-full bg-gray-900 h-[100%]">
@@ -160,7 +142,6 @@ const ChatBox = () => {
           placeholder="write your message"
           className="p-2 rounded-xl w-[70%] md:w-[80%]"
           value={msg}
-          
         />
         <button
           onClick={msgSend}

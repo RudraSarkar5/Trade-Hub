@@ -29,13 +29,42 @@ const ProductInfo = () => {
       toast.error("Please log in first to connect with seller!");
       return;
     }
+    
+    
     const action = await dispatch(createChat({senderId : userData._id, receiverId : productOwner._id}));
     if(action?.payload?.success){
-      const { _id  } = action.payload.chat;
-      const chat = {
-        chatId : _id,
-        chatFriend : productOwner,
+
+      let needMarkRead = false;
+
+      const { _id , unRead , lastMessage } = action.payload.chat;
+      
+      if ( lastMessage ){
+
+        try {
+
+          const { data } = await axios.get(`/chats/single-messageData/:${lastMessage}`);
+          
+        } catch (error) {
+          console.log("here error");
+          console.log(error.message);
+        
+        }
+
+                                        
+        if ( (data.messageData.senderId != userData._id) && (unRead == true) ) {
+
+               needMarkRead = true;
+
+         }                    
+
       }
+
+      const chat = {
+        chatId: _id,
+        needMarkRead,
+        chatFriend: productOwner,
+      };
+      
       dispatch(updateCurrentChat({chat}));
       navigate("/chat");
     }

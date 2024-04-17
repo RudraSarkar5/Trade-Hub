@@ -13,6 +13,7 @@ const friendSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "message",
     },
+
     unRead: {
       type: Boolean,
       default: false,

@@ -52,11 +52,11 @@ export const deleteFriendIfNoMessage = async (req, res, next) => {
          throw new AppError("invalid request",400);
       }
 
-      const chatExist = await messageModel.find({chatId});
+      const messageExist = await messageModel.find({chatId});
       
-      if (chatExist.length == 0) {
-        
-         await chatModel.findByIdAndDelete(chatId);
+      if (messageExist == 0) {
+
+        await chatModel.findByIdAndDelete(chatId);
 
       }
 
@@ -189,6 +189,29 @@ export const getMessagesOfParticularChat = async (req, res, next) => {
   
 };
 
+export const getPaticularSingleMessage = async ( req, res, next ) =>{
+    
+  const { messageId } = req.params;
+
+  try {
+    
+    const messageData = await messageModel.findById(messageId);
+
+    if (messageData) {
+      return res.status(200).json({
+        success: true,
+        message: "successfully fetched message.",
+        messageData,
+      });
+    }
+
+  } catch (error) {
+    
+    next(error);
+
+  }
+}
+
 export const addMessage = async (req, res, next) => {
   
   const {  content } = req.body;
@@ -206,11 +229,13 @@ export const addMessage = async (req, res, next) => {
       chatId,
       content,
     });
-    console.log(messageInstance);
 
-    const updatedChatInstance = await chatModel.findByIdAndUpdate(chatId , {$set:{lastMessage:messageInstance._id}},{new : true});
+    const updatedChatInstance = await chatModel.findByIdAndUpdate(
+      chatId,
+      { $set: { lastMessage: messageInstance._id } },
+      { new: true }
+    );
 
-    console.log(updatedChatInstance);
 
     return res.status(200).json({
       success : true,
@@ -220,72 +245,50 @@ export const addMessage = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+
+};
+
+export const makeRead = async (req, res , next ) => {
+
+  const { chatId } = req.params;
+
+  try {
     
+    const updatedChat = await chatModel.findByIdAndUpdate(chatId,{ $set : { unRead : false }},{ new : true });
+    
+    if( updatedChat ){
+      res.status(200).json({
+        success : true,
+        message : "successfully updated unread field.",
+        chat : updatedChat,
+      })
+    }
 
-
-
-  const friendShipExistForFriend = await friendModel.findOne({
-      userId: receiverId,
-      friendId: senderId,
-    });
-
-  if (friendShipExistForFriend) {
-
-    friendShipExistForFriend.lastMessage = message;
-    await friendExistForUser.save();
-
-  } else {
-
-    const forFriend = await friendModel.create({
-      userId: receiverId,
-      friendId: senderId,
-      lastMessage: message,
-    });
-
+  } catch (error) {
+     
+    next(error);
+  
   }
-
-  const messgaeRecord = await chatModel.create({
-    participants : [senderId,receiverId],
-    senderId,
-    content: message,
-  });
-
-  return res.status(200).json({
-    success : true,
-    messagess : "succesfully insertend"
-  })
+  
 };
 
-export const makeRead = async (req, res) => {
+export const makeUnRead = async (chatId) => {
 
-  const { receiverId, senderId } = req.body;
-  
-  const userFriend = await friendModel.findOne({
-    userId: senderId,
-    friendId: receiverId,
-  });
+  try {
 
-  if (userFriend) {
-    userFriend.unRead = false;
-    await userFriend.save();
+   const existChat = await chatModel.findByIdAndUpdate(
+     chatId,
+     { $set: { unRead: true } },
+     { new: true }
+   );
+    
+  } catch (error) {
+
+    console.log(error.message);
+
   }
-  return res.status(200).json({
-    success: true,
-    message: "all good",
-    receiverId
-  });
-};
 
-export const makeUnRead = async ({userId,friendId}) => {
-
-  const userFriend = await friendModel.findOne({
-    userId,
-    friendId
-  });
   
-  if (userFriend) {
-    userFriend.unRead = true;
-    await userFriend.save();
-  }
+ 
   
 };

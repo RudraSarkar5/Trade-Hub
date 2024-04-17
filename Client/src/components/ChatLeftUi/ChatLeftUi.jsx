@@ -19,12 +19,25 @@ const ChatLeftUi = ({ showBox }) => {
            currentChat } = useSelector((state) => state.chat);
   const { userData } = useSelector((state) => state.user);
 
-  const handleClickOnFriend = (chat) => {
+  const handleClickOnFriend = ({ chatId, chatFriend, unRead, lastMessage }) => {
     
-    if (currentChat?.chatId == chat.chatId){
+    if (currentChat?.chatId == chatId ){
       dispatch(clearCurrentChat());
       return;
     }
+
+    let needMarkRead = false;
+
+    if ( ( lastMessage.senderId != userData._id) && ( unRead == true ) ){
+        needMarkRead = true;
+    }
+
+    const chat = {
+       chatId,
+       chatFriend,
+       needMarkRead,
+    }
+
     dispatch(updateCurrentChat({ chat }));
 
   };
@@ -43,7 +56,7 @@ const ChatLeftUi = ({ showBox }) => {
     <div className={leftBarClassName}>
       <div className="w-full h-fit bg-gray-900 p-2 items-center flex gap-2 ">
         <Link to="/">
-          <IoMdArrowBack />
+          <IoMdArrowBack onClick={() => dispatch(clearCurrentChat())} />
         </Link>
         <img
           src={
@@ -62,13 +75,16 @@ const ChatLeftUi = ({ showBox }) => {
         {chatList?.length > 0 &&
           chatList.map(
             ({ user, _id, unRead, lastMessage }) =>
-            (
               lastMessage && (
                 <div
                   key={_id}
-                  onClick={() => handleClickOnFriend({chatId:_id,chatFriend:user})}
+                  onClick={() =>
+                    handleClickOnFriend({ chatId: _id, chatFriend: user, unRead, lastMessage })
+                  }
                   className={`w-full h-fit  p-4 items-center flex gap-3 bg-gray-500 ${
-                    currentChat?.chatFriend?._id == user._id ? "md:bg-sky-700" : "bg-gray-500"
+                    currentChat?.chatFriend?._id == user._id
+                      ? "md:bg-sky-700"
+                      : "bg-gray-500"
                   } rounded-lg`}
                 >
                   <img
@@ -85,7 +101,7 @@ const ChatLeftUi = ({ showBox }) => {
                     <h1 className=" text-xl text-black">{user?.name}</h1>
                     <p
                       className={` text-xl ${
-                        unRead ? "text-yellow-500 " : "text-white "
+                       (lastMessage.senderId != userData._id && unRead == true) ? "text-yellow-500 " : "text-white "
                       }`}
                     >
                       {lastMessage.content}
@@ -93,7 +109,6 @@ const ChatLeftUi = ({ showBox }) => {
                   </div>
                 </div>
               )
-            )
           )}
       </div>
     </div>
