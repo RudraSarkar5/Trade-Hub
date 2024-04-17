@@ -4,9 +4,12 @@ import ChatLeftUi from "../../components/ChatLeftUi/ChatLeftUi";
 import Layout from "../../Layout/Layout";
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useNotification } from "../../contexApi/ContextProvider";
+// import 
 
 const Chat = () => {
 
+  const { setModifyNotication, setNotification } = useNotification();
   const { showChatBox } = useSelector((state)=>state.chat)
   
   const [showChat, setShowChat] = useState(false);
@@ -18,6 +21,14 @@ const Chat = () => {
       setShowChat(false);
     }
   }, [showChatBox]);
+
+  useEffect (()=>{
+    setModifyNotication(true);
+    setNotification(0);
+    return ()=>{
+      setModifyNotication(false);
+    }
+  })
 
 
   return (

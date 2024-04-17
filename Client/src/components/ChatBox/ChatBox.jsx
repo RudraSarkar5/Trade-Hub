@@ -3,11 +3,11 @@ import { IoMdArrowBack } from "react-icons/io";
 import UserMessage from "../Messages/UserMessage";
 import FriedMessage from "../Messages/FriendMessage";
 
-import { socket } from "../../helper/socket";
+// import { socket } from "../../helper/socket";
 import { useLocation, useParams } from "react-router-dom";
 import Layout from "../../Layout/Layout";
 import axios from "../../helper/axiosInstance";
-
+import { useSocket } from "../../contexApi/ContextProvider";
 import { useContext } from "react";
 import { chatContext } from "../../contexApi/ContextProvider";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,6 +16,9 @@ import { makeRead } from "../../../../Server/src/controllers/chat.controller.js"
 
 const ChatBox = () => {
   const dispatch = useDispatch();
+
+  const { socket, socketConnected } = useSocket();
+  
 
   const { currentChat } = useSelector((state) => state.chat);
   

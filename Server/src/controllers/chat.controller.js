@@ -292,3 +292,53 @@ export const makeUnRead = async (chatId) => {
  
   
 };
+
+export const getChatNotification = async( req, res, next ) => {
+   
+  const userId = req.user._id;
+
+  try {
+
+    const notification = await chatModel.aggregate([
+      {
+        $match: {
+          participants: new mongoose.Types.ObjectId(userId),
+          unRead: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "messages",
+          localField: "lastMessage",
+          foreignField : "_id",
+          as : "lastMessage",
+        },
+      },
+      {
+        $unwind : "$lastMessage"
+      },
+      {
+        $match : {
+          "lastMessage.senderId" : { $ne : new mongoose.Types.ObjectId(userId)} 
+        }
+      },
+      {
+        $count : "notificationCount",
+      }
+    ]);
+
+    res.status(200).json({
+      success : true,
+      message : "successfully fetched notification",
+      data : notification[0],
+    })
+
+  } catch (error) {
+    
+    next(error);
+
+  }
+
+}
+
+
