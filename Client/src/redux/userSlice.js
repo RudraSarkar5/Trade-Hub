@@ -65,6 +65,7 @@ export const login = createAsyncThunk(
      response = await response;
      return response.data;
     } catch (error) {
+        throw error;
         console.log(error.message);
     }
   }
@@ -116,8 +117,38 @@ export const getUserDetails = createAsyncThunk(
       let response = await axios.get("/users/user-details"); 
       return response.data;
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         throw  error;
+    }
+  }
+);
+
+export const forgetPassword = createAsyncThunk(
+  "action/forgetPassword",
+  async function (email) {
+    
+    try {
+      let response = await axios.post("/users/forget-password",email);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+);
+
+export const resetPassword = createAsyncThunk(
+  "action/resetPassword",
+  async function ({ password, resetToken }) {
+    try {
+      let response = await axios.post(
+        `/users/reset-password/${resetToken}`,
+        {password}
+      );
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      throw error;
     }
   }
 );

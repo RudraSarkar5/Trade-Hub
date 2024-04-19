@@ -329,7 +329,7 @@ export const getChatNotification = async( req, res, next ) => {
     res.status(200).json({
       success : true,
       message : "successfully fetched notification",
-      data : notification[0],
+      data : notification[0] || 0,
     })
 
   } catch (error) {

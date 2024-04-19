@@ -10,6 +10,8 @@ import Error from "../pages/ErrorPage/Error";
 import EditProduct from "../pages/EditProductPage/EditProduct";
 import EditProfile from "../pages/EditProfilePage/EditProfile";
 import ChatBox from "../components/ChatBox/ChatBox";
+import ForgetPasswordPage from "../pages/ForgetPasswordPage/ForgetPasswordPage";
+import ResetPasswordPage from "../pages/ResetPasswordPage/ResetPasswordPage";
 
 const CustomRoutes = () => {
   return (
@@ -24,6 +26,8 @@ const CustomRoutes = () => {
       <Route path="/profile-update" element={<EditProfile />} />
       <Route path="/product-update" element={<EditProduct />} />
       <Route path="/contact-us" element={<ContactUs />} />
+      <Route path="/forget-password" element={<ForgetPasswordPage/>} />
+      <Route path="/reset-password/:resetToken" element={<ResetPasswordPage/>} />
       <Route path="/*" element={<Error />} />
     </Routes>
   );

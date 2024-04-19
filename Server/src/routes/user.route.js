@@ -7,6 +7,8 @@ import {
   userProfileEdit,
   getUserDetails,
   getSellerDetails,
+  forgetPassword,
+  resetPassword,
 } from "../controllers/user.controller.js";
 import {
   upload,
@@ -39,5 +41,11 @@ userRoute.route("/logout").get(isLoggedIn, userLogOut);
 userRoute
   .route("/profile-update")
   .patch(upload.single("avatar"), isLoggedIn, userProfileEdit);
+
+// to send mail to change password
+userRoute.route("/forget-password").post(forgetPassword);  
+
+// resetPassword
+userRoute.route("/reset-password/:resetToken").post(resetPassword);  
 
 export default userRoute;

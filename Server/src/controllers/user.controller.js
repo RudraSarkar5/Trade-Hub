@@ -1,5 +1,8 @@
 import emailValidator from "email-validator";
-import { passwordHashed, comparePassword } from "../utility/password.js";
+import { passwordHashed,
+        comparePassword,
+         generateCryptoToken,
+          hashedCryptoToken } from "../utility/password.js";
 import userModel from "../models/user.model.js";
 import productModel from "../models/product.model.js";
 import { generateJwtToken } from "../utility/jwtAuth.js";
@@ -10,6 +13,8 @@ import {
   fileUploadInCloudinary,
 } from "../utility/fileManage.js";
 import { cookieOption } from "../constants.js";
+import { envObject } from "../config/envConfig.js";
+import { sendMail } from "../utility/sendMail.js";
 
 
 
@@ -367,3 +372,91 @@ export const userProfileEdit = async (req, res) => {
 
   }
 };
+
+export const forgetPassword = async (req, res, next)=>{
+   
+  const { email } = req.body;
+  console.log("email is",email);
+
+  try {
+
+    if (!email) {
+      throw new AppError("please provide email!", 400);
+    }
+
+    const user = await userModel.findOne({email});
+
+    if (!user) {
+      throw new AppError("email is not registered!", 400);
+    }
+
+    const resetPasswordToken =  generateCryptoToken();
+    const hashedResetToken = hashedCryptoToken(resetPasswordToken);
+
+    user.resetPasswordToken = hashedResetToken;
+    user.tokenExpire = Date.now() + 15 * 60 * 1000;
+    await user.save();
+
+    const resetPasswordUrl = `${envObject.clientUrl}/reset-password/${resetPasswordToken}`;
+    const subject = "reset password";
+    const message = `click here to reset password <a href=${resetPasswordUrl} target="_blank">Reset your password</a>\n If this link does not work for any reason then just  copy and  paste this link in new tab ${resetPasswordUrl}.\n If you have not requested to forget password then ignor this message.`;
+    
+    try {
+      await sendMail(email, subject, message ,next);
+    } catch (error) {
+      next(error);
+    }
+
+    res.status(200).json({
+      success : true,
+      message : "email sent successfully!",
+    })
+
+  } catch (error) {
+
+    next(error);
+
+  }
+}
+
+export const resetPassword = async (req, res, next)=>{
+  const { resetToken } = req.params;
+  const { password } = req.body;
+
+  try {
+
+    if ( !password ){
+      throw new AppError("password not provided!",400);
+    }
+
+    const hashedResetToken =  hashedCryptoToken(resetToken);
+
+    const user = await userModel.findOne({
+      resetPasswordToken : hashedResetToken,
+      tokenExpire : { $gt : Date.now()},
+    })
+
+    if (!user) {
+      
+      throw  new AppError("Token is invalid or expired, please try again", 400)
+     
+    }
+
+    const hashedPassword = passwordHashed(password);
+    user.password = hashedPassword;
+
+    
+    user.resetPasswordToken = undefined;
+    user.tokenExpire = undefined;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password changed successfully",
+    });
+    
+  } catch (error) {
+    next(error);
+  }
+}
