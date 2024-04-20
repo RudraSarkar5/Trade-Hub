@@ -91,8 +91,6 @@ const ChatBox = () => {
         });
       }
 
-      dispatch(clearCurrentChat());
-
       if(currentChat){
         // this api call will delete chat record if the particular chat have no message
         axios.delete(`/chats/check-empty-chat/${currentChat.chatId}`);
@@ -114,8 +112,8 @@ const ChatBox = () => {
   }, [socket]);
 
   return (
-    <div className="md:w-2/3 w-full bg-gray-900 h-[100%]">
-      <div className="w-full h-fit p-2 items-center flex gap-2 ">
+    <div className="md:w-2/3  w-full bg-[#273752] h-[100%]">
+      <div className="w-full h-fit py-3 pl-3 items-center flex gap-4 ">
         <IoMdArrowBack
           onClick={() => dispatch(clearCurrentChat())}
           className="md:hidden block"
@@ -130,10 +128,10 @@ const ChatBox = () => {
           width={25}
           className="rounded-lg"
         />
-        <h1>{currentChat?.chatFriend?.name}</h1>
+        <h1 className="text-lg">{currentChat?.chatFriend?.name}</h1>
       </div>
 
-      <div className="w-full bg-gray-500 overflow-y-scroll h-[85%] md:h-[80%] chatBox space-y-2">
+      <div className="w-full bg-[#3b475c] overflow-y-scroll h-[85%] md:h-[80%] chatBox space-y-2">
         {allMsg.length > 0 &&
           allMsg.map((message, idx) => {
             if (message.senderId == userData?._id) {

@@ -2,12 +2,13 @@ import React, { useState,useEffect } from "react";
 import ChatBox from "../../components/ChatBox/ChatBox";
 import ChatLeftUi from "../../components/ChatLeftUi/ChatLeftUi";
 import Layout from "../../Layout/Layout";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNotification } from "../../contexApi/ContextProvider";
+import { clearCurrentChat } from "../../redux/chatSlice";
 
 
 const Chat = () => {
-
+  const dispatch = useDispatch();
   const { setModifyNotication, setNotification } = useNotification();
   const { showChatBox } = useSelector((state)=>state.chat)
   
@@ -26,8 +27,9 @@ const Chat = () => {
     setNotification(0);
     return ()=>{
       setModifyNotication(false);
+      dispatch(clearCurrentChat());
     }
-  })
+  },[]);
 
 
   return (

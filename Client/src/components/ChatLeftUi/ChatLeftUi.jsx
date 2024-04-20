@@ -56,7 +56,7 @@ const ChatLeftUi = ({ showBox }) => {
 
   return (
     <div className={leftBarClassName}>
-      <div className="w-full h-fit bg-gray-900 p-2 items-center flex gap-2 ">
+      <div className="w-full h-fit bg-[#273752] py-3 pl-2 items-center flex gap-2 ">
         <Link to="/">
           <IoMdArrowBack onClick={() => dispatch(clearCurrentChat())} />
         </Link>
@@ -70,7 +70,7 @@ const ChatLeftUi = ({ showBox }) => {
           width={25}
           className="rounded-lg"
         />
-        <h1>{userData && userData.name}</h1>
+        <h1 className="text-xl">{userData && userData.name}</h1>
       </div>
       <div className="w-full overflow-y-scroll  h-full space-y-2">
         {chatList?.length > 0 &&
@@ -80,13 +80,18 @@ const ChatLeftUi = ({ showBox }) => {
                 <div
                   key={_id}
                   onClick={() =>
-                    handleClickOnFriend({ chatId: _id, chatFriend: user, unRead, lastMessage })
+                    handleClickOnFriend({
+                      chatId: _id,
+                      chatFriend: user,
+                      unRead,
+                      lastMessage,
+                    })
                   }
-                  className={`w-full h-fit  p-4 items-center flex gap-3 bg-gray-500 ${
+                  className={`w-full h-fit  p-2 items-center flex gap-3 bg[#1b263b] ${
                     currentChat?.chatFriend?._id == user._id
                       ? "md:bg-sky-700"
                       : "bg-gray-500"
-                  } rounded-lg`}
+                  } rounded-xl`}
                 >
                   <img
                     src={
@@ -95,17 +100,20 @@ const ChatLeftUi = ({ showBox }) => {
                         : user?.avatar.secure_url
                     }
                     alt="friendPhoto"
-                    width={25}
-                    className="rounded-lg"
+                    width={35}
+                    className="rounded-xl"
                   />
                   <div>
-                    <h1 className=" text-xl text-black">{user?.name}</h1>
+                    <h1 className=" text-lg text-black">{user?.name}</h1>
                     <p
-                      className={` text-xl ${
-                       (lastMessage.senderId != userData._id && unRead == true) ? "text-yellow-500 " : "text-white "
+                      className={` text-lg ${
+                        lastMessage.senderId != userData._id && unRead == true
+                          ? "text-black "
+                          : "text-white "
                       }`}
                     >
-                      {lastMessage.content}
+                      {lastMessage.content.substring(0, 35)}
+                      {lastMessage.content.length > 35 && "..."}
                     </p>
                   </div>
                 </div>
