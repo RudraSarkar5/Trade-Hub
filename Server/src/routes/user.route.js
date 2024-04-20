@@ -9,6 +9,7 @@ import {
   getSellerDetails,
   forgetPassword,
   resetPassword,
+  sendFeedback,
 } from "../controllers/user.controller.js";
 import {
   upload,
@@ -47,5 +48,8 @@ userRoute.route("/forget-password").post(forgetPassword);
 
 // resetPassword
 userRoute.route("/reset-password/:resetToken").post(resetPassword);  
+
+// resetPassword
+userRoute.route("/send-feedback").post(isLoggedIn,sendFeedback);  
 
 export default userRoute;

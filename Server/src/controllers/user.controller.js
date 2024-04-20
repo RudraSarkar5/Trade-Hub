@@ -402,7 +402,7 @@ export const forgetPassword = async (req, res, next)=>{
     const message = `click here to reset password <a href=${resetPasswordUrl} target="_blank">Reset your password</a>\n If this link does not work for any reason then just  copy and  paste this link in new tab ${resetPasswordUrl}.\n If you have not requested to forget password then ignor this message.`;
     
     try {
-      await sendMail(email, subject, message ,next);
+      await sendMail(envObject.myEmail, email, subject, message ,next);
     } catch (error) {
       next(error);
     }
@@ -459,4 +459,43 @@ export const resetPassword = async (req, res, next)=>{
   } catch (error) {
     next(error);
   }
+}
+
+export const sendFeedback = async ( req, res, next)=>{
+
+   const userId = req.user._id;
+   const { name, message } = req.body;
+
+   try {
+    
+    const user = await userModel.findById(userId);
+
+    if(!user){
+      throw new AppError("user not found!",400);
+    }
+
+    const email = user.email;
+    const subject = " User Review ";
+    const messagebody = `
+        <p>Hi Trade-Hub Com.,</p>
+        <p>Myself ${name}.</p>
+        <p>My user email is ${email}.</p>
+        <p>My message is:</p>
+        <p style="margin-left: 20px;">"${message}"</p>
+    `;
+
+     try {
+       await sendMail(email, envObject.myEmail, subject, messagebody, next);
+     } catch (error) {
+       next(error);
+     }
+
+     res.status(200).json({
+      success : true,
+      message : "successfully send your feedback!",
+     })
+
+   } catch (error) {
+    next(error);
+   }
 }

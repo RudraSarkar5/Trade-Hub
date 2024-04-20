@@ -153,6 +153,21 @@ export const resetPassword = createAsyncThunk(
   }
 );
 
+export const sendFeedback = createAsyncThunk(
+  "action/sendFeedback",
+  async function (data) {
+    try {
+      let response = await axios.post("/users/send-feedback", data);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+);
+
+
+
 
 
 const userSlice = createSlice({

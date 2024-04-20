@@ -1,7 +1,7 @@
 import { envObject } from "../config/envConfig.js";
 import nodemailer from "nodemailer";
 
-export const sendMail = ( email , subject , message, next)=>{
+export const sendMail = ( fromEmail , toEmail,  subject , message, next )=>{
     const transporter = nodemailer.createTransport({
         service : "gmail",
         auth : {
@@ -12,11 +12,11 @@ export const sendMail = ( email , subject , message, next)=>{
     })
 
     const mailOptions = {
-        from : envObject.myEmail,
-        to : email,
-        subject : subject,
-        html : message,
-    }
+      from: fromEmail,
+      to: toEmail,
+      subject: subject,
+      html: message,
+    };
 
     transporter.sendMail(mailOptions, (error, info)=> {
         if (error) {
