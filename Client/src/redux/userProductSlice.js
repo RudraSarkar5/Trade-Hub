@@ -103,7 +103,7 @@ const userProductSlice = createSlice({
           })
 
           .addCase(deleteProduct.fulfilled, (state, action) => {
-            state.productUpToDate = true;
+            state.productUpToDate = false;
           })
           
           .addCase(updateProduct.fulfilled, (state, action) => {
